@@ -1,8 +1,6 @@
 // =======================
-// CONFIGURACIÓN & DATOS
+// CONFIGURACIÓN ULTRA
 // =======================
-// NOTA: He cambiado HTTP a HTTPS. Las que no soporten HTTPS fallarán.
-// Es necesario para que funcione en GitHub Pages.
 const stations = [
   // PERÚ
   { name: "Radio Moda", country: "Perú", region: "Sudamérica", url: "https://25023.live.streamtheworld.com/CRP_MOD_SC" },
@@ -11,18 +9,25 @@ const stations = [
   { name: "La Zona", country: "Perú", region: "Sudamérica", url: "https://mdstrm.com/audio/5fada54116646e098d97e6a5/icecast.audio" },
   { name: "RPP Noticias", country: "Perú", region: "Sudamérica", url: "https://mdstrm.com/audio/5fab3416b5f9ef165cfab6e9/icecast.audio" },
   { name: "Exitosa", country: "Perú", region: "Sudamérica", url: "https://neptuno-2-audio.mediaserver.digital/79525baf-b0f5-4013-a8bd-3c5c293c6561" },
-  
+  { name: "Radio Corazón", country: "Perú", region: "Sudamérica", url: "https://mdstrm.com/audio/5fada514fc16c006bd63370f/icecast.audio" },
+  { name: "La Inolvidable", country: "Perú", region: "Sudamérica", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_LI_SC" },
+  { name: "Radio Mágica", country: "Perú", region: "Sudamérica", url: "https://26513.live.streamtheworld.com/MAG_AAC_SC" },
+  { name: "Radiomar", country: "Perú", region: "Sudamérica", url: "https://24873.live.streamtheworld.com/CRP_MARAAC_SC" },
+
   // EUROPA
   { name: "RFI Español", country: "Francia", region: "Europa", url: "https://rfiespagnol64k.ice.infomaniak.ch/rfienespagnol-64.mp3" },
   { name: "RNE 5", country: "España", region: "Europa", url: "https://dispatcher.rndfnk.com/crtve/rne5/main/mp3/high?aggregator=tunein" },
   { name: "Cadena COPE", country: "España", region: "Europa", url: "https://net1-cope-rrcast.flumotion.com/cope/net1-low.mp3" },
+  { name: "Radio ES", country: "España", region: "Europa", url: "https://libertaddigital-radio-live1.flumotion.com/libertaddigital/ld-live1-low.mp3" },
   
-  // AÑADE MÁS AQUÍ (SOLO HTTPS)
+  // INTERNACIONAL
+  { name: "Radio Florida", country: "Internacional", region: "Norteamérica", url: "https://s8.myradiostream.com/56524/stream" } // Intenté arreglar esta URL a https si es posible, si falla bórrala
 ];
 
 const regionClassMap = {
   Sudamérica: "badge-sudamerica",
-  Europa: "badge-europa"
+  Europa: "badge-europa",
+  Norteamérica: "badge-default"
 };
 
 let favorites = new Set(JSON.parse(localStorage.getItem("ultra_favs") || "[]"));
@@ -53,12 +58,14 @@ const els = {
 // LÓGICA PRINCIPAL
 // =======================
 const init = () => {
+  if(!els.list) return console.error("Error: No encuentro el elemento 'stationList'. Revisa tu HTML.");
+  
   loadFilters();
   renderList();
   setupListeners();
 };
 
-// --- Búsqueda Inteligente (Normaliza texto) ---
+// --- Búsqueda Inteligente ---
 const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 const renderList = () => {
@@ -78,7 +85,7 @@ const renderList = () => {
   });
 
   if (filtered.length === 0) {
-    els.list.innerHTML = `<p style="color:#666; text-align:center; width:100%;">No hay resultados.</p>`;
+    els.list.innerHTML = `<p style="color:#888; text-align:center; grid-column: 1/-1; padding: 2rem;">No hay resultados.</p>`;
     return;
   }
 
@@ -86,9 +93,13 @@ const renderList = () => {
     const isActive = currentStation && currentStation.name === st.name;
     const isFav = favorites.has(st.name);
     
+    // AQUÍ ESTÁ LA MAGIA: Creamos un DIV con clase station-card, NO un button
     const div = document.createElement("div");
     div.className = `station-card ${isActive ? 'active' : ''}`;
+    
+    // Click en la tarjeta reproduce
     div.onclick = (e) => {
+      // Evitar que el click en el botón de favoritos dispare el play
       if(!e.target.closest('.fav-btn')) playStation(st);
     };
 
@@ -106,20 +117,20 @@ const renderList = () => {
         <div class="visualizer">
           <div class="bar"></div><div class="bar"></div><div class="bar"></div>
         </div>
-        <button class="fav-btn ${isFav ? 'is-fav' : ''}">
+        <button class="fav-btn ${isFav ? 'is-fav' : ''}" aria-label="Favorito">
           ${isFav ? '★' : '☆'}
         </button>
       </div>
     `;
 
-    // Lógica Favorito
+    // Evento botón favoritos
     const btnFav = div.querySelector('.fav-btn');
     btnFav.onclick = (e) => {
       e.stopPropagation();
       if(favorites.has(st.name)) favorites.delete(st.name);
       else favorites.add(st.name);
       localStorage.setItem("ultra_favs", JSON.stringify([...favorites]));
-      renderList(); // Re-render para actualizar iconos
+      renderList();
     };
 
     els.list.appendChild(div);
@@ -128,20 +139,22 @@ const renderList = () => {
 
 // --- Player Logic ---
 const playStation = (station) => {
-  // Reset visual previo
-  document.querySelectorAll('.station-card').forEach(c => c.classList.remove('active'));
+  // Actualizar visualmente todas las tarjetas
+  const allCards = document.querySelectorAll('.station-card');
+  allCards.forEach(c => c.classList.remove('active'));
   
+  // Si estamos pausando la misma canción
   if (currentStation && currentStation.name === station.name && isPlaying) {
-    // Si es la misma y está sonando, pausar
     togglePlay();
+    renderList(); // Para actualizar el estado visual
     return;
   }
 
   currentStation = station;
   els.title.innerText = station.name;
-  els.artist.innerText = "Cargando stream...";
-  els.status.innerText = "CONECTANDO...";
-  els.status.style.color = "#ffca28"; // Ambar
+  els.artist.innerText = "Conectando satélite...";
+  els.status.innerText = "CARGANDO";
+  els.status.style.color = "#ffca28"; 
 
   els.player.src = station.url;
   els.player.volume = els.volSlider.value;
@@ -151,11 +164,10 @@ const playStation = (station) => {
   if (playPromise !== undefined) {
     playPromise.then(() => {
       setPlayingState(true);
-      // Actualizar UI Lista
-      renderList();
+      renderList(); // Re-render para mostrar el visualizador en la tarjeta activa
     }).catch(error => {
       console.error("Error playback:", error);
-      els.artist.innerText = "Error: Stream offline o no seguro (HTTP).";
+      els.artist.innerText = "Error: Stream offline o inseguro.";
       els.status.innerText = "ERROR";
       els.status.style.color = "#ff3d3d";
       setPlayingState(false);
@@ -177,16 +189,18 @@ const togglePlay = () => {
 const setPlayingState = (playing) => {
   isPlaying = playing;
   if (playing) {
-    els.iconPlay.style.display = "none";
-    els.iconPause.style.display = "block";
+    if(els.iconPlay) els.iconPlay.style.display = "none";
+    if(els.iconPause) els.iconPause.style.display = "block";
     els.status.innerText = "EN VIVO";
     els.status.classList.add("live");
-    els.artist.innerText = `${currentStation.country} · ${currentStation.region}`;
+    els.status.style.color = "#00e676";
+    if(currentStation) els.artist.innerText = `${currentStation.country} · ${currentStation.region}`;
   } else {
-    els.iconPlay.style.display = "block";
-    els.iconPause.style.display = "none";
+    if(els.iconPlay) els.iconPlay.style.display = "block";
+    if(els.iconPause) els.iconPause.style.display = "none";
     els.status.innerText = "PAUSADO";
     els.status.classList.remove("live");
+    els.status.style.color = "var(--accent)";
   }
 };
 
@@ -210,24 +224,28 @@ const fillSelect = (sel, arr) => {
 };
 
 const setupListeners = () => {
-  els.btnPlay.addEventListener("click", togglePlay);
+  if(els.btnPlay) els.btnPlay.addEventListener("click", togglePlay);
   
-  els.volSlider.addEventListener("input", (e) => {
-    els.player.volume = e.target.value;
-  });
+  if(els.volSlider) {
+    els.volSlider.addEventListener("input", (e) => {
+      els.player.volume = e.target.value;
+    });
+  }
 
-  els.search.addEventListener("input", renderList);
-  els.region.addEventListener("change", renderList);
-  els.country.addEventListener("change", renderList);
-  els.favToggle.addEventListener("change", renderList);
+  if(els.search) els.search.addEventListener("input", renderList);
+  if(els.region) els.region.addEventListener("change", renderList);
+  if(els.country) els.country.addEventListener("change", renderList);
+  if(els.favToggle) els.favToggle.addEventListener("change", renderList);
 
-  els.clearFilters.addEventListener("click", () => {
-    els.search.value = "";
-    els.region.value = "Todas";
-    els.country.value = "Todos";
-    els.favToggle.checked = false;
-    renderList();
-  });
+  if(els.clearFilters) {
+    els.clearFilters.addEventListener("click", () => {
+      els.search.value = "";
+      els.region.value = "Todas";
+      els.country.value = "Todos";
+      els.favToggle.checked = false;
+      renderList();
+    });
+  }
 };
 
 // Arrancar
