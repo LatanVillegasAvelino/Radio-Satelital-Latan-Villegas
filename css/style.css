@@ -1,9 +1,9 @@
 /* =========================
-   ULTRA CORE v2 (GOD MODE)
+   ULTRA CORE v2.5 (THEMES ENABLED)
    ========================= */
 :root {
+  /* --- DEFAULT THEME (Cyber Dark) --- */
   --bg-dark: #05070a;
-  /* Fondo más sofisticado, menos azul saturado, más gris profundo */
   --bg-glass: rgba(15, 17, 22, 0.65); 
   --border-glass: rgba(255, 255, 255, 0.08);
   --accent: #ff3d3d; 
@@ -14,9 +14,38 @@
   --font-main: 'Inter', sans-serif;
 }
 
+/* --- THEME OVERRIDES --- */
+
+/* 1. AMOLED (Negro Absoluto) */
+body[data-theme="amoled"] {
+  --bg-dark: #000000;
+  --bg-glass: rgba(20, 20, 20, 0.9); /* Menos transparencia para contraste */
+  --border-glass: rgba(255, 255, 255, 0.15);
+  --accent: #ffffff; /* Blanco puro como acento en AMOLED */
+  --accent-glow: rgba(255, 255, 255, 0.3);
+}
+/* En modo AMOLED, ocultamos el fondo ambiental para apagar pixeles */
+body[data-theme="amoled"] .ambient-bg {
+  display: none;
+}
+
+/* 2. GOLD LUXURY */
+body[data-theme="gold"] {
+  --accent: #ffd700;
+  --accent-glow: rgba(255, 215, 0, 0.6);
+}
+
+/* 3. NEON PURPLE */
+body[data-theme="purple"] {
+  --accent: #d500f9;
+  --accent-glow: rgba(213, 0, 249, 0.6);
+}
+
+
+/* --- BASE STYLES --- */
+
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Tipografía de precisión */
 body {
   margin: 0;
   font-family: var(--font-main);
@@ -24,17 +53,16 @@ body {
   color: var(--text-main);
   min-height: 100vh;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased; /* Renderizado nítido */
+  transition: background 0.3s ease, color 0.3s ease; /* Suavizar cambio de tema */
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Números tabulares para evitar saltos en UI */
 .track-title, .status-indicator, input {
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
 }
 
-/* Scrollbar Custom (Invisible pero funcional) */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-dark); }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
@@ -47,17 +75,16 @@ body {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   z-index: -1;
-  /* Gradiente más oscuro y elegante */
-  background: radial-gradient(circle at 50% -20%, #1e1e24 0%, #05070a 60%),
+  background: radial-gradient(circle at 50% -20%, #1e1e24 0%, var(--bg-dark) 60%),
               radial-gradient(circle at 80% 80%, #2a0a0a 0%, transparent 50%);
+  transition: opacity 0.5s;
 }
 
-/* Textura de grano cinematográfico (Noise) */
 .ambient-bg::after {
   content: "";
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
-  opacity: 0.04; /* Grano sutil */
+  opacity: 0.04; 
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
@@ -69,15 +96,15 @@ body {
    ========================= */
 .glass-panel {
   background: var(--bg-glass);
-  backdrop-filter: blur(16px); /* Blur optimizado */
+  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-glass);
-  /* Borde superior iluminado para efecto 3D */
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: var(--radius);
-  padding: 1.8rem; /* Más aire */
+  padding: 1.8rem;
   box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 /* =========================
@@ -90,7 +117,8 @@ body {
   background: linear-gradient(135deg, var(--accent), #b71c1c);
   border-radius: 50%;
   display: grid; place-items: center;
-  box-shadow: 0 0 25px rgba(255, 61, 61, 0.3);
+  box-shadow: 0 0 25px var(--accent-glow);
+  transition: box-shadow 0.3s, background 0.3s;
 }
 .brand-wave {
   width: 26px; height: 26px;
@@ -111,17 +139,25 @@ body {
   gap: 2.5rem;
   padding-bottom: 4rem;
 }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+/* FIX MOVIL: Reproductor arriba o sticky abajo. 
+   Para v2.5, vamos a dejarlo arriba pero que no ocupe todo. */
+@media (max-width: 900px) { 
+  .layout { grid-template-columns: 1fr; gap: 1.5rem; } 
+  .site-header { padding: 1rem 0; }
+  .site-title { font-size: 1.5rem; }
+}
 
 /* =========================
    CONTROLES (PLAYER)
    ========================= */
-.player-section { text-align: center; }
+.player-section { text-align: center; position: relative; z-index: 10; }
 
 .status-indicator {
   font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
   color: var(--accent); font-weight: 700; opacity: 0.8;
   display: inline-block; margin-bottom: 0.5rem;
+  transition: color 0.3s;
 }
 .status-indicator.live { color: #00e676; text-shadow: 0 0 12px rgba(0,230,118,0.4); }
 
@@ -146,7 +182,7 @@ body {
 .play-btn:active { transform: scale(0.95); }
 .play-btn svg { width: 32px; height: 32px; fill: #000; }
 
-/* Slider de Volumen (Llenado dinámico por JS) */
+/* Slider */
 .volume-control { width: 100%; display: flex; align-items: center; gap: 15px; color: var(--text-muted); }
 input[type=range] {
   -webkit-appearance: none; width: 100%; height: 6px;
@@ -168,13 +204,16 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
 .panel-head h3 { margin: 0; font-size: 1.2rem; font-weight: 700; }
 
+.input-label { display: block; text-align: left; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500;}
+.separator { border: 0; border-top: 1px solid var(--border-glass); margin: 1.5rem 0; opacity: 0.5; }
+
 .input-dark {
   background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
   color: #fff; padding: 0.9rem 1.2rem; border-radius: 10px;
   width: 100%; outline: none; font-family: inherit; font-size: 0.95rem;
   transition: all 0.3s;
 }
-.input-dark:focus { border-color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 0 2px rgba(255,61,61,0.2); }
+.input-dark:focus { border-color: var(--accent); background: rgba(0,0,0,0.4); box-shadow: 0 0 0 2px var(--accent-glow); }
 
 .station-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -183,17 +222,17 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
 /* Tarjeta Magnética */
 .station-card {
-  position: relative; /* Necesario para el glow */
+  position: relative; 
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.05);
   padding: 1.2rem; border-radius: 14px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: space-between;
-  transition: transform 0.2s ease, background 0.2s;
-  overflow: hidden; /* Contiene el glow */
+  transition: transform 0.2s ease, background 0.2s, border-color 0.2s;
+  overflow: hidden; 
 }
 
-/* Efecto Hover Magnético (Linterna) */
+/* Efecto Hover Magnético */
 .station-card::before {
   content: "";
   position: absolute;
@@ -207,15 +246,17 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   pointer-events: none; z-index: 1;
 }
 .station-card:hover::before { opacity: 1; }
-
 .station-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.2); }
 
-/* Estado Activo (Brillo Neon) */
+/* Estado Activo */
 .station-card.active {
   background: rgba(20, 23, 30, 0.9);
   border-color: var(--accent);
-  box-shadow: inset 0 0 20px rgba(255, 61, 61, 0.15), 0 10px 20px rgba(0,0,0,0.2);
+  box-shadow: inset 0 0 20px var(--accent-glow), 0 10px 20px rgba(0,0,0,0.2);
   z-index: 2;
+}
+body[data-theme="amoled"] .station-card.active {
+  background: #111; /* Fondo sólido para AMOLED active */
 }
 
 .st-info { display: flex; align-items: center; gap: 12px; z-index: 2; position: relative; }
@@ -225,25 +266,24 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 }
 .badge-sudamerica { background: linear-gradient(135deg, #e53935, #8e0000); }
 .badge-europa { background: linear-gradient(135deg, #1e88e5, #005cb2); }
+.badge-norteamerica { background: linear-gradient(135deg, #43a047, #1b5e20); }
 .badge-default { background: linear-gradient(135deg, #757575, #424242); }
 
 .st-name { font-weight: 600; font-size: 1rem; display: block; margin-bottom: 2px; }
 .st-meta { font-size: 0.8rem; color: var(--text-muted); }
 
-/* VISUALIZER MEJORADO (5 barras) */
+/* VISUALIZER */
 .visualizer {
   display: flex; gap: 3px; height: 18px; align-items: flex-end;
   opacity: 0; transition: opacity 0.3s; z-index: 2;
 }
 .station-card.active .visualizer { opacity: 1; }
-
 .bar { width: 3px; background: var(--accent); border-radius: 2px; animation: bounce 0s infinite alternate; }
 .bar:nth-child(1) { height: 60%; animation-duration: 0.4s; }
 .bar:nth-child(2) { height: 100%; animation-duration: 0.55s; }
 .bar:nth-child(3) { height: 50%; animation-duration: 0.45s; }
 .bar:nth-child(4) { height: 80%; animation-duration: 0.6s; }
 .bar:nth-child(5) { height: 40%; animation-duration: 0.35s; }
-
 @keyframes bounce { 
   0% { height: 20%; opacity: 0.6; } 
   100% { height: 100%; opacity: 1; } 
@@ -259,10 +299,4 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .site-footer {
   text-align: center; color: var(--text-muted); padding: 2rem; margin-top: 2rem;
   font-size: 0.8rem; border-top: 1px solid var(--border-glass);
-}
-
-/* Transiciones de Vista (View Transitions) */
-::view-transition-group(root) {
-  animation-duration: 0.35s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
