@@ -1,71 +1,86 @@
-// ====== LISTA DE EMISORAS ======
+// =======================
+// LISTA DE EMISORAS
+// =======================
+// De momento metadataUrl se queda vacío.
+// Más adelante se usará para leer artista/canción.
 const stations = [
   // ====== PERÚ – LIMA / NACIONAL ======
   {
     name: "Radio Moda",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://25023.live.streamtheworld.com/CRP_MOD_SC"
+    url: "https://25023.live.streamtheworld.com/CRP_MOD_SC",
+    metadataUrl: ""
   },
   {
     name: "Ritmo Romántica",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://25103.live.streamtheworld.com/CRP_RIT_SC"
+    url: "https://25103.live.streamtheworld.com/CRP_RIT_SC",
+    metadataUrl: ""
   },
   {
     name: "Onda Cero",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://mdstrm.com/audio/6598b65ab398c90871aff8cc/icecast.audio"
+    url: "https://mdstrm.com/audio/6598b65ab398c90871aff8cc/icecast.audio",
+    metadataUrl: ""
   },
   {
     name: "La Zona",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://mdstrm.com/audio/5fada54116646e098d97e6a5/icecast.audio"
+    url: "https://mdstrm.com/audio/5fada54116646e098d97e6a5/icecast.audio",
+    metadataUrl: ""
   },
   {
     name: "Corazón",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://mdstrm.com/audio/5fada514fc16c006bd63370f/icecast.audio"
+    url: "https://mdstrm.com/audio/5fada514fc16c006bd63370f/icecast.audio",
+    metadataUrl: ""
   },
   {
     name: "La Inolvidable",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_LI_SC"
+    url: "https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_LI_SC",
+    metadataUrl: ""
   },
   {
     name: "Mágica",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://26513.live.streamtheworld.com/MAG_AAC_SC"
+    url: "https://26513.live.streamtheworld.com/MAG_AAC_SC",
+    metadataUrl: ""
   },
   {
     name: "Radiomar",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://24873.live.streamtheworld.com/CRP_MARAAC_SC"
+    url: "https://24873.live.streamtheworld.com/CRP_MARAAC_SC",
+    metadataUrl: ""
   },
   {
     name: "RPP",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://mdstrm.com/audio/5fab3416b5f9ef165cfab6e9/icecast.audio"
+    url: "https://mdstrm.com/audio/5fab3416b5f9ef165cfab6e9/icecast.audio",
+    metadataUrl: ""
   },
   {
     name: "Romántica (otra señal)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://27153.live.streamtheworld.com/CRP_RIT_SC"
+    url: "https://27153.live.streamtheworld.com/CRP_RIT_SC",
+    metadataUrl: ""
   },
   {
     name: "Exitosa Noticias",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://neptuno-2-audio.mediaserver.digital/79525baf-b0f5-4013-a8bd-3c5c293c6561"
+    url: "https://neptuno-2-audio.mediaserver.digital/79525baf-b0f5-4013-a8bd-3c5c293c6561",
+    metadataUrl: ""
   },
 
   // ====== PERÚ – REGIONES / CAJAMARCA / PUNO, ETC. ======
@@ -73,133 +88,155 @@ const stations = [
     name: "Radio Santa Lucía",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://sp.dattavolt.com/8014/stream"
+    url: "https://sp.dattavolt.com/8014/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Pampa Yurac",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://rr5200.globalhost1.com/8242/stream"
+    url: "https://rr5200.globalhost1.com/8242/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Turbo Mix",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://serverssl.innovatestream.pe:8080/167.114.118.120:7624/stream"
+    url: "https://serverssl.innovatestream.pe:8080/167.114.118.120:7624/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Fuego",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://serverssl.innovatestream.pe:8080/sp.onliveperu.com:8128/"
+    url: "https://serverssl.innovatestream.pe:8080/sp.onliveperu.com:8128/",
+    metadataUrl: ""
   },
   {
     name: "Radio Stereo TV",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://sp.onliveperu.com:7048/stream"
+    url: "https://sp.onliveperu.com:7048/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio La Kuadra",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://dattavolt.com/8046/stream"
+    url: "https://dattavolt.com/8046/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Frecuencia",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://conectperu.com/8384/stream"
+    url: "https://conectperu.com/8384/stream",
+    metadataUrl: ""
   },
   {
     name: "Onda Popular (Cajamarca)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://envivo.top:8443/am"
+    url: "https://envivo.top:8443/am",
+    metadataUrl: ""
   },
   {
     name: "Onda Popular (Juliaca, Puno)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://dattavolt.com/8278/stream"
+    url: "https://dattavolt.com/8278/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Nor Andina",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://mediastreamm.com/8012/stream/1/"
+    url: "https://mediastreamm.com/8012/stream/1/",
+    metadataUrl: ""
   },
   {
     name: "Radio Andina",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://serverssl.innovatestream.pe:8080/http://167.114.118.120:7058/;stream"
+    url: "https://serverssl.innovatestream.pe:8080/http://167.114.118.120:7058/;stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Ilucán",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://serverssl.innovatestream.pe:8080/167.114.118.120:7820/;stream"
+    url: "https://serverssl.innovatestream.pe:8080/167.114.118.120:7820/;stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Bambamarca",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://envivo.top:8443/lider"
+    url: "https://envivo.top:8443/lider",
+    metadataUrl: ""
   },
   {
     name: "Radio Continente",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://sonic6.my-servers.org/10170/"
+    url: "https://sonic6.my-servers.org/10170/",
+    metadataUrl: ""
   },
   {
     name: "La Cheverísima (Jaén, Cajamarca)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://sp.onliveperu.com/8114/stream"
+    url: "https://sp.onliveperu.com/8114/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio TV El Shaddai (Cajamarca)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://stream.zeno.fm/ppr5q4q3x1zuv"
+    url: "https://stream.zeno.fm/ppr5q4q3x1zuv",
+    metadataUrl: ""
   },
   {
     name: "Radio Inica Digital (Cajamarca)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://stream.zeno.fm/487vgx80yuhvv"
+    url: "https://stream.zeno.fm/487vgx80yuhvv",
+    metadataUrl: ""
   },
   {
     name: "Radio La Falsa (Cajamarca)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://stream.zeno.fm/b9x47pyk21zuv"
+    url: "https://stream.zeno.fm/b9x47pyk21zuv",
+    metadataUrl: ""
   },
   {
     name: "Radio Activa (Jaén, Cajamarca)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://sp.onliveperu.com/8108/stream"
+    url: "https://sp.onliveperu.com/8108/stream",
+    metadataUrl: ""
   },
   {
     name: "Radio Mía",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://streaming.zonalatinaeirl.com:8020/radio"
+    url: "https://streaming.zonalatinaeirl.com:8020/radio",
+    metadataUrl: ""
   },
   {
     name: "Radio Patrón",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://streaming.zonalatinaeirl.com:8010/radio"
+    url: "https://streaming.zonalatinaeirl.com:8010/radio",
+    metadataUrl: ""
   },
   {
     name: "Radio El Patrón (otra señal)",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://serverssl.innovatestream.pe:8080/http://sp.onliveperu.com:8046/;stream"
+    url: "https://serverssl.innovatestream.pe:8080/http://sp.onliveperu.com:8046/;stream",
+    metadataUrl: ""
   },
 
   // ====== PERÚ – OTROS / TEMÁTICAS ======
@@ -207,19 +244,22 @@ const stations = [
     name: "Radio Televisión Sureña",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://stream.zeno.fm/p7d5fpx4xnhvv"
+    url: "https://stream.zeno.fm/p7d5fpx4xnhvv",
+    metadataUrl: ""
   },
   {
     name: "Radio Enamorados",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://stream.zeno.fm/gnybbqc1fnruv"
+    url: "https://stream.zeno.fm/gnybbqc1fnruv",
+    metadataUrl: ""
   },
   {
     name: "Radio PBO",
     country: "Perú",
     region: "Sudamérica",
-    url: "https://stream.radiojar.com/2fse67zuv8hvv"
+    url: "https://stream.radiojar.com/2fse67zuv8hvv",
+    metadataUrl: ""
   },
 
   // ====== FRANCIA / ESPAÑA – EUROPA ======
@@ -227,37 +267,43 @@ const stations = [
     name: "RFI Internacional en Español (64k)",
     country: "Francia",
     region: "Europa",
-    url: "https://rfienespagnol64k.ice.infomaniak.ch/rfienespagnol-64.mp3"
+    url: "https://rfienespagnol64k.ice.infomaniak.ch/rfienespagnol-64.mp3",
+    metadataUrl: ""
   },
   {
     name: "RFI Español (96k)",
     country: "Francia",
     region: "Europa",
-    url: "https://rfiespagnol96k.ice.infomaniak.ch/rfiespagnol-96k.mp3"
+    url: "https://rfiespagnol96k.ice.infomaniak.ch/rfiespagnol-96k.mp3",
+    metadataUrl: ""
   },
   {
     name: "RNE 5 España",
     country: "España",
     region: "Europa",
-    url: "https://dispatcher.rndfnk.com/crtve/rne5/main/mp3/high?aggregator=tunein"
+    url: "https://dispatcher.rndfnk.com/crtve/rne5/main/mp3/high?aggregator=tunein",
+    metadataUrl: ""
   },
   {
     name: "Radio Tele Taxi (Barcelona)",
     country: "España",
     region: "Europa",
-    url: "https://radiott-web.streaming-pro.com:6103/radiott.mp3"
+    url: "https://radiott-web.streaming-pro.com:6103/radiott.mp3",
+    metadataUrl: ""
   },
   {
     name: "Radio ES (Libertad Digital)",
     country: "España",
     region: "Europa",
-    url: "https://libertaddigital-radio-live1.flumotion.com/libertaddigital/ld-live1-low.mp3"
+    url: "https://libertaddigital-radio-live1.flumotion.com/libertaddigital/ld-live1-low.mp3",
+    metadataUrl: ""
   },
   {
     name: "Cadena COPE",
     country: "España",
     region: "Europa",
-    url: "https://net1-cope-rrcast.flumotion.com/cope/net1-low.mp3"
+    url: "https://net1-cope-rrcast.flumotion.com/cope/net1-low.mp3",
+    metadataUrl: ""
   },
 
   // ====== INTERNACIONAL / OTROS PAÍSES ======
@@ -265,30 +311,46 @@ const stations = [
     name: "Radio Internacional La Florida",
     country: "Internacional",
     region: "Norteamérica",
-    url: "http://s8.myradiostream.com:56524/"
+    url: "http://s8.myradiostream.com:56524/",
+    metadataUrl: ""
   },
   {
     name: "Radio Internacional La Hondureña",
     country: "Honduras",
     region: "Centroamérica",
-    url: "https://s2.mkservers.space/rih"
+    url: "https://s2.mkservers.space/rih",
+    metadataUrl: ""
   },
   {
     name: "Radio Vallenato Internacional",
     country: "Internacional",
     region: "Sudamérica",
-    url: "http://server7.servistreaming.com:10010/stream"
+    url: "http://server7.servistreaming.com:10010/stream",
+    metadataUrl: ""
   }
 ];
 
-// ====== REFERENCIAS DEL DOM ======
+// Mapa de región -> clase de icono (color)
+const regionClassMap = {
+  "Sudamérica": "badge-sudamerica",
+  "Centroamérica": "badge-centroamerica",
+  "Norteamérica": "badge-norteamerica",
+  "Europa": "badge-europa",
+  "Internacional": "badge-internacional"
+};
+
+// =======================
+// REFERENCIAS DEL DOM
+// =======================
 const regionSelect = document.getElementById("regionSelect");
 const countrySelect = document.getElementById("countrySelect");
 const stationList = document.getElementById("stationList");
 const player = document.getElementById("radioPlayer");
 const currentStation = document.getElementById("currentStation");
 
-// ====== INICIO ======
+// =======================
+// INICIO
+// =======================
 function init() {
   cargarRegiones();
   actualizarPaises();
@@ -304,7 +366,9 @@ function init() {
   });
 }
 
-// ====== CARGAR REGIONES ======
+// =======================
+// CARGAR REGIONES
+// =======================
 function cargarRegiones() {
   const regiones = ["Todas"];
   stations.forEach((st) => {
@@ -322,7 +386,9 @@ function cargarRegiones() {
   });
 }
 
-// ====== ACTUALIZAR PAÍSES SEGÚN REGIÓN ======
+// =======================
+// ACTUALIZAR PAÍSES
+// =======================
 function actualizarPaises() {
   const regionSeleccionada = regionSelect.value;
   const paises = ["Todos"];
@@ -344,7 +410,9 @@ function actualizarPaises() {
   });
 }
 
-// ====== RENDERIZAR EMISORAS ======
+// =======================
+// RENDERIZAR EMISORAS
+// =======================
 function renderStations() {
   const regionSeleccionada = regionSelect.value;
   const paisSeleccionado = countrySelect.value;
@@ -368,28 +436,58 @@ function renderStations() {
     const btn = document.createElement("button");
     btn.className = "station-btn";
 
+    const row = document.createElement("div");
+    row.className = "station-row";
+
+    // Icono genérico por región (color distinto)
+    const badge = document.createElement("div");
+    const regionClass = regionClassMap[st.region] || "badge-internacional";
+    badge.className = "station-icon " + regionClass;
+
+    const info = document.createElement("div");
+    info.className = "station-info";
+
     const title = document.createElement("div");
+    title.className = "station-title";
     title.textContent = st.name;
 
     const meta = document.createElement("div");
     meta.className = "station-meta";
     meta.textContent = `${st.country} · ${st.region}`;
 
-    btn.appendChild(title);
-    btn.appendChild(meta);
+    info.appendChild(title);
+    info.appendChild(meta);
 
-    btn.addEventListener("click", () => playRadio(st));
+    row.appendChild(badge);
+    row.appendChild(info);
+    btn.appendChild(row);
+
+    btn.addEventListener("click", () => playRadio(st, btn));
 
     stationList.appendChild(btn);
   });
 }
 
-// ====== REPRODUCIR EMISORA ======
-function playRadio(station) {
+// =======================
+// REPRODUCIR EMISORA
+// =======================
+function playRadio(station, btnClicked) {
   player.src = station.url;
   player.play();
   currentStation.textContent = `Reproduciendo: ${station.name} (${station.country} · ${station.region})`;
+
+  // Quitar estado activo de todos
+  document.querySelectorAll(".station-btn").forEach((b) => {
+    b.classList.remove("active");
+  });
+
+  // Marcar la actual
+  if (btnClicked) {
+    btnClicked.classList.add("active");
+  }
 }
 
-// ====== INICIAR CUANDO CARGUE EL DOM ======
+// =======================
+// INICIAR
+// =======================
 document.addEventListener("DOMContentLoaded", init);
