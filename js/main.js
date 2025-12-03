@@ -1,5 +1,5 @@
 // =======================
-// SYSTEM CONFIG v6.1 (STABLE CORE)
+// SYSTEM CONFIG v6.2 (NAVIGATION CORE)
 // =======================
 
 const defaultStations = [
@@ -65,6 +65,8 @@ let secondsElapsed = 0;
 const els = {
   player: document.getElementById("radioPlayer"),
   btnPlay: document.getElementById("btnPlay"),
+  btnPrev: document.getElementById("btnPrev"), // NUEVO
+  btnNext: document.getElementById("btnNext"), // NUEVO
   volSlider: document.getElementById("volSlider"),
   status: document.getElementById("statusIndicator"),
   title: document.getElementById("currentStation"),
@@ -90,16 +92,13 @@ const els = {
 const init = () => {
   if(!els.list) return;
   
-  // 1. Cargar Custom Stations de LocalStorage y mezclar
   const customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
-  stations = [...customStations, ...defaultStations]; // Custom primero
+  stations = [...customStations, ...defaultStations];
 
-  // 2. Theme
   const savedTheme = localStorage.getItem("ultra_theme") || "default";
   setTheme(savedTheme);
   if(els.themeSelect) els.themeSelect.value = savedTheme;
 
-  // 3. Setup
   loadFilters();
   els.search.value = ""; els.region.value = "Todas"; els.country.value = "Todos"; els.favToggle.checked = false;
   
@@ -116,17 +115,13 @@ const setTheme = (themeName) => {
 };
 
 // =======================
-// PLAYER LOGIC & STATS
+// PLAYER LOGIC & NAVIGATION
 // =======================
 const simulateStats = () => {
-  // Genera números aleatorios creíbles
   const viewers = Math.floor(Math.random() * (5000 - 100) + 100);
   const likes = Math.floor(viewers * (Math.random() * 0.8));
-  
-  // Animar números
   animateValue(els.listenerCount, 0, viewers, 1000);
   animateValue(els.likeCount, 0, likes, 1000);
-  
   els.statsRow.style.opacity = "1";
 };
 
@@ -150,7 +145,7 @@ const playStation = (station) => {
   els.status.innerText = "CONECTANDO...";
   els.status.style.color = "";
   els.badge.style.display = "none";
-  els.statsRow.style.opacity = "0"; // Reset stats
+  els.statsRow.style.opacity = "0";
   
   stopTimer();
   if(els.timer) els.timer.innerText = "00:00";
@@ -162,7 +157,7 @@ const playStation = (station) => {
   if (p !== undefined) {
     p.then(() => {
       setPlayingState(true);
-      simulateStats(); // Trigger simulated stats
+      simulateStats();
       if (navigator.vibrate) navigator.vibrate([10,30]);
     }).catch(e => {
       console.error(e);
@@ -198,6 +193,22 @@ const setPlayingState = (playing) => {
   renderList();
 };
 
+// FUNCION DE NAVEGACION (NUEVO)
+const skipStation = (direction) => {
+  if (!currentStation || stations.length === 0) return;
+  
+  // Buscar en la lista global (o podrías ajustar para buscar solo en filtrados)
+  // Usamos la lista completa para navegación consistente
+  const currentIndex = stations.findIndex(s => s.name === currentStation.name);
+  let newIndex = currentIndex + direction;
+  
+  // Loop Infinito
+  if (newIndex >= stations.length) newIndex = 0;
+  if (newIndex < 0) newIndex = stations.length - 1;
+
+  playStation(stations[newIndex]);
+};
+
 // =======================
 // CUSTOM STATIONS LOGIC
 // =======================
@@ -210,11 +221,8 @@ const addCustomStation = (e) => {
   if(name && url) {
     const newStation = { name, country, region: "Custom", url, isCustom: true };
     const customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
-    
     customStations.push(newStation);
     localStorage.setItem("ultra_custom", JSON.stringify(customStations));
-    
-    // Recargar todo
     location.reload(); 
   }
 };
@@ -261,11 +269,7 @@ const renderList = () => {
     const div = document.createElement("div");
     div.className = `station-card ${isActive ? 'active' : ''} ${animatingClass}`;
     
-    // Delete btn for custom stations
-    let deleteHtml = '';
-    if(st.isCustom) {
-      deleteHtml = `<button class="del-btn" aria-label="Eliminar">×</button>`;
-    }
+    let deleteHtml = st.isCustom ? `<button class="del-btn" aria-label="Eliminar">×</button>` : '';
 
     div.innerHTML = `
       <div class="st-info">
@@ -282,7 +286,6 @@ const renderList = () => {
       if(!e.target.closest('button')) playStation(st); 
     };
     
-    // Fav Handler
     div.querySelector('.fav-btn').onclick = (e) => {
       e.stopPropagation();
       if(favorites.has(st.name)) favorites.delete(st.name); else favorites.add(st.name);
@@ -290,7 +293,6 @@ const renderList = () => {
       renderList();
     };
 
-    // Delete Handler
     if(st.isCustom) {
       div.querySelector('.del-btn').onclick = (e) => deleteCustomStation(e, st.name);
     }
@@ -301,7 +303,15 @@ const renderList = () => {
 
 const updateVolumeVisuals = (val) => {
   const percentage = val * 100;
-  const gradient = `linear-gradient(90deg, #ff00cc 0%, #3333ff ${percentage}%, rgba(255,255,255,0.1) ${percentage}%)`;
+  // LOGICA GLASS GROOVE:
+  // Parte llena: Blanco (#fff)
+  // Parte vacía: Transparente (para que se vea el surco oscuro del CSS)
+  const gradient = `linear-gradient(90deg, 
+    #ffffff 0%, 
+    #ffffff ${percentage}%, 
+    rgba(255,255,255,0.0) ${percentage}%, 
+    rgba(255,255,255,0.0) 100%)`;
+  
   els.volSlider.style.background = gradient;
 };
 
@@ -337,22 +347,29 @@ const stopTimer = () => { if (timerInterval) clearInterval(timerInterval); };
 
 const setupListeners = () => {
   els.btnPlay.addEventListener("click", togglePlay);
+  
+  // LISTENERS DE NAVEGACION
+  els.btnPrev.addEventListener("click", () => skipStation(-1));
+  els.btnNext.addEventListener("click", () => skipStation(1));
+
   els.volSlider.addEventListener("input", (e) => {
     const val = e.target.value;
     els.player.volume = val;
     updateVolumeVisuals(val);
   });
+  
   els.themeSelect.addEventListener("change", (e) => {
     setTheme(e.target.value);
     localStorage.setItem("ultra_theme", e.target.value);
   });
+  
   [els.search, els.region, els.country].forEach(el => el.addEventListener("input", renderList));
   els.favToggle.addEventListener("change", renderList);
   els.clearFilters.addEventListener("click", () => {
     els.search.value = ""; els.region.value = "Todas"; els.country.value = "Todos"; els.favToggle.checked = false;
     renderList();
   });
-  // Add Station Form
+  
   if(els.addForm) els.addForm.addEventListener("submit", addCustomStation);
 };
 
