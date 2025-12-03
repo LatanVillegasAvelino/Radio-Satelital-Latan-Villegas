@@ -1,5 +1,5 @@
 // =======================
-// SYSTEM CONFIG v5.0 (CUSTOM STATIONS & STATS)
+// SYSTEM CONFIG v5.1 (DYNAMIC PLAYER BG)
 // =======================
 
 const defaultStations = [
@@ -76,11 +76,12 @@ const els = {
   favToggle: document.getElementById("favoritesToggle"),
   clearFilters: document.getElementById("clearFilters"),
   themeSelect: document.getElementById("themeSelect"),
-  // Nuevos elementos
   statsRow: document.getElementById("statsRow"),
   listenerCount: document.getElementById("listenerCount"),
   likeCount: document.getElementById("likeCount"),
-  addForm: document.getElementById("addStationForm")
+  addForm: document.getElementById("addStationForm"),
+  // NUEVO: Referencia al fondo dinámico
+  playerBg: document.getElementById("playerDynamicBg")
 };
 
 // =======================
@@ -89,16 +90,13 @@ const els = {
 const init = () => {
   if(!els.list) return;
   
-  // 1. Cargar Custom Stations de LocalStorage y mezclar
   const customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
-  stations = [...customStations, ...defaultStations]; // Custom primero
+  stations = [...customStations, ...defaultStations];
 
-  // 2. Theme
   const savedTheme = localStorage.getItem("ultra_theme") || "default";
   setTheme(savedTheme);
   if(els.themeSelect) els.themeSelect.value = savedTheme;
 
-  // 3. Setup
   loadFilters();
   els.search.value = ""; els.region.value = "Todas"; els.country.value = "Todos"; els.favToggle.checked = false;
   
@@ -115,17 +113,33 @@ const setTheme = (themeName) => {
 };
 
 // =======================
+// DYNAMIC COLOR GENERATOR (NUEVO)
+// =======================
+const generateStationColor = (name) => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  // Generar dos colores HSL basados en el hash
+  const h1 = Math.abs(hash % 360);
+  const h2 = (h1 + 40) % 360; // Color análogo
+  
+  // Saturación media-alta y luminosidad baja para que sea un fondo oscuro
+  const color1 = `hsl(${h1}, 70%, 20%)`;
+  const color2 = `hsl(${h2}, 80%, 15%)`;
+  
+  return `linear-gradient(135deg, ${color1}, ${color2})`;
+};
+
+// =======================
 // PLAYER LOGIC & STATS
 // =======================
 const simulateStats = () => {
-  // Genera números aleatorios creíbles
   const viewers = Math.floor(Math.random() * (5000 - 100) + 100);
   const likes = Math.floor(viewers * (Math.random() * 0.8));
-  
-  // Animar números
   animateValue(els.listenerCount, 0, viewers, 1000);
   animateValue(els.likeCount, 0, likes, 1000);
-  
   els.statsRow.style.opacity = "1";
 };
 
@@ -149,10 +163,18 @@ const playStation = (station) => {
   els.status.innerText = "CONECTANDO...";
   els.status.style.color = "";
   els.badge.style.display = "none";
-  els.statsRow.style.opacity = "0"; // Reset stats
+  els.statsRow.style.opacity = "0";
   
   stopTimer();
   if(els.timer) els.timer.innerText = "00:00";
+
+  // NUEVO: Actualizar el fondo dinámico
+  if (els.playerBg) {
+    const dynamicGradient = generateStationColor(station.name);
+    els.playerBg.style.backgroundImage = dynamicGradient;
+    // Añadir clase al padre para mostrar el fondo (controlado por CSS)
+    els.player.closest('.player-section').classList.add('active-station');
+  }
 
   els.player.src = station.url;
   els.player.volume = els.volSlider.value;
@@ -161,7 +183,7 @@ const playStation = (station) => {
   if (p !== undefined) {
     p.then(() => {
       setPlayingState(true);
-      simulateStats(); // Trigger simulated stats
+      simulateStats();
       if (navigator.vibrate) navigator.vibrate([10,30]);
     }).catch(e => {
       console.error(e);
@@ -209,11 +231,8 @@ const addCustomStation = (e) => {
   if(name && url) {
     const newStation = { name, country, region: "Custom", url, isCustom: true };
     const customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
-    
     customStations.push(newStation);
     localStorage.setItem("ultra_custom", JSON.stringify(customStations));
-    
-    // Recargar todo
     location.reload(); 
   }
 };
@@ -260,7 +279,6 @@ const renderList = () => {
     const div = document.createElement("div");
     div.className = `station-card ${isActive ? 'active' : ''} ${animatingClass}`;
     
-    // Delete btn for custom stations
     let deleteHtml = '';
     if(st.isCustom) {
       deleteHtml = `<button class="del-btn" aria-label="Eliminar">×</button>`;
@@ -277,11 +295,8 @@ const renderList = () => {
       </div>
     `;
     
-    div.onclick = (e) => { 
-      if(!e.target.closest('button')) playStation(st); 
-    };
+    div.onclick = (e) => { if(!e.target.closest('button')) playStation(st); };
     
-    // Fav Handler
     div.querySelector('.fav-btn').onclick = (e) => {
       e.stopPropagation();
       if(favorites.has(st.name)) favorites.delete(st.name); else favorites.add(st.name);
@@ -289,7 +304,6 @@ const renderList = () => {
       renderList();
     };
 
-    // Delete Handler
     if(st.isCustom) {
       div.querySelector('.del-btn').onclick = (e) => deleteCustomStation(e, st.name);
     }
@@ -351,7 +365,6 @@ const setupListeners = () => {
     els.search.value = ""; els.region.value = "Todas"; els.country.value = "Todos"; els.favToggle.checked = false;
     renderList();
   });
-  // Add Station Form
   if(els.addForm) els.addForm.addEventListener("submit", addCustomStation);
 };
 
