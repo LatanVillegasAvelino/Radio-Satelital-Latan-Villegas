@@ -52,7 +52,6 @@ const stations = [
   { name: "Radio ES", country: "España", region: "Europa", url: "https://libertaddigital-radio-live1.flumotion.com/libertaddigital/ld-live1-low.mp3" },
   { name: "Cadena COPE", country: "España", region: "Europa", url: "https://net1-cope-rrcast.flumotion.com/cope/net1-low.mp3" },
   { name: "Radio La Hondureña", country: "Honduras", region: "Centroamérica", url: "https://s2.mkservers.space/rih" }
-  // NOTA: Eliminadas radios HTTP inseguras (Florida, Vallenato) para compatibilidad web.
 ];
 
 const regionClassMap = {
@@ -122,10 +121,10 @@ const setTheme = (themeName) => {
     document.body.setAttribute("data-theme", themeName);
   }
   
-  // Metatag para barra de estado navegador móvil
+  // Actualizar metatag de barra de estado móvil
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if(metaTheme) {
-    // Si es AMOLED, negro puro. Si no, gris oscuro.
+    // Si es AMOLED, negro puro #000000. Si no, el gris #05070a
     if(themeName === "amoled") metaTheme.setAttribute("content", "#000000");
     else metaTheme.setAttribute("content", "#05070a");
   }
