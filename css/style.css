@@ -1,285 +1,260 @@
 /* =========================
-   DIRECTOR'S CUT v1.0 (PRO GRADE)
+   DIRECTOR'S CUT v3.0 (AMOLED EDITION)
    ========================= */
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap');
 
 :root {
-  /* --- PALETA DE COLORES (COHERENTE) --- */
-  /* Fondo: Un negro azulado profundo, no negro puro, no gris sucio */
+  --radius: 8px; /* Bordes más afilados, más pro */
+  --font-display: 'Manrope', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- TEMAS --- */
+
+/* 1. AMOLED (Default: Contraste Máximo) */
+[data-theme="amoled"] {
+  --bg-deep: #000000;
+  --bg-panel: #000000; /* Negro puro */
+  --accent: #00ffcc; /* Cian más menta, más moderno */
+  --accent-dim: rgba(0, 255, 204, 0.1);
+  --accent-glow: rgba(0, 255, 204, 0.5);
+  --text-main: #ffffff;
+  --text-muted: #888888;
+  --border-subtle: #333333; /* Gris oscuro para delimitar en negro */
+  --border-active: #00ffcc;
+  --input-bg: #111111;
+}
+
+/* 2. MIDNIGHT (Lo que tenías antes, pero arreglado) */
+[data-theme="midnight"] {
   --bg-deep: #030508;
   --bg-panel: #0b0e14;
-  
-  /* Acento: Electric Cyan. Tecnológico, limpio, sin connotaciones de error */
   --accent: #00f0ff;
   --accent-dim: rgba(0, 240, 255, 0.15);
   --accent-glow: rgba(0, 240, 255, 0.4);
-
-  /* Texto */
   --text-main: #f0f4f8;
   --text-muted: #64748b;
-  
-  /* Bordes y Superficies */
-  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-subtle: rgba(255, 255, 255, 0.08);
   --border-active: rgba(0, 240, 255, 0.5);
-  
-  /* Valores */
-  --radius: 12px; /* Reducido para parecer más técnico, menos juguete */
-  --font-display: 'Manrope', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --input-bg: rgba(0,0,0,0.3);
+}
+
+/* 3. GOLD (Lujo) */
+[data-theme="gold"] {
+  --bg-deep: #12100e;
+  --bg-panel: #1a1816;
+  --accent: #ffd700;
+  --accent-dim: rgba(255, 215, 0, 0.15);
+  --accent-glow: rgba(255, 215, 0, 0.4);
+  --text-main: #fff8e1;
+  --text-muted: #a69b8d;
+  --border-subtle: rgba(255, 215, 0, 0.15);
+  --border-active: #ffd700;
+  --input-bg: rgba(255, 215, 0, 0.05);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  margin: 0;
-  font-family: var(--font-display);
-  background: var(--bg-deep);
-  color: var(--text-main);
-  min-height: 100vh;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  margin: 0; font-family: var(--font-display);
+  background: var(--bg-deep); color: var(--text-main);
+  min-height: 100vh; line-height: 1.5;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* =========================
-   FONDO LIMPIO (Sin ruido barato)
-   ========================= */
+/* Fondo decorativo sutil (solo visible en temas no-Amoled) */
 .ambient-bg {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  z-index: -1;
-  background: 
-    radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(0, 90, 255, 0.08) 0%, transparent 40%);
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+  background: radial-gradient(circle at 50% 0%, var(--accent-dim) 0%, transparent 40%);
+  opacity: 0.4; pointer-events: none;
 }
+[data-theme="amoled"] .ambient-bg { display: none; /* Negro puro en Amoled */ }
 
-.container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+.container { max-width: 1440px; margin: 0 auto; padding: 0 1.5rem; }
 
-/* =========================
-   HEADER (Marca Técnica)
-   ========================= */
-.site-header { padding: 3rem 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 2rem; }
-
-.brand-mark { display: flex; align-items: center; gap: 1.5rem; }
-
+/* HEADER */
+.site-header { padding: 2rem 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 2rem; }
+.brand-mark { display: flex; align-items: center; gap: 1rem; }
 .brand-icon {
-  width: 48px; height: 48px;
-  background: var(--accent);
-  border-radius: 4px; /* Cuadrado técnico en lugar de círculo suave */
-  display: grid; place-items: center;
-  box-shadow: 0 0 20px var(--accent-glow);
+  width: 42px; height: 42px; background: var(--accent);
+  border-radius: 2px; display: grid; place-items: center;
+  box-shadow: 0 0 15px var(--accent-glow);
 }
-
-.brand-wave {
-  width: 20px; height: 20px;
-  border: 3px solid #000; border-radius: 50%;
-}
-
-.site-title {
-  margin: 0; font-weight: 800; font-size: 2rem;
-  letter-spacing: -0.03em; color: #fff;
-}
-
+.brand-wave { width: 16px; height: 16px; border: 2px solid #000; border-radius: 50%; }
+.site-title { margin: 0; font-weight: 800; font-size: 1.5rem; color: var(--text-main); line-height: 1; }
 .site-subtitle { 
-  margin: 0; color: var(--accent); 
-  font-family: var(--font-mono); font-size: 0.75rem; 
-  letter-spacing: 0.2em; text-transform: uppercase; 
+  margin: 0; color: var(--accent); font-family: var(--font-mono); 
+  font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; 
 }
 
-/* =========================
-   LAYOUT (Estructura Sólida)
-   ========================= */
+/* LAYOUT */
 .layout {
-  display: grid;
-  grid-template-columns: 380px 1fr; /* Sidebar un poco más ancha */
-  gap: 3rem;
-  padding-bottom: 4rem;
-  align-items: start;
+  display: grid; grid-template-columns: 320px 1fr; gap: 2rem; padding-bottom: 4rem; align-items: start;
 }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
 
-@media (max-width: 1024px) { 
-  .layout { grid-template-columns: 1fr; } 
-}
-
-/* =========================
-   PANELES (Adiós Glassmorphism Sucio)
-   ========================= */
+/* PANELES */
 .glass-panel {
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
-  padding: 2rem;
-  /* Eliminado el blur excesivo que causaba lag y suciedad visual */
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  padding: 1.5rem;
 }
 
-/* =========================
-   SIDEBAR & PLAYER (El Héroe)
-   ========================= */
-.player-section { text-align: center; position: relative; overflow: hidden; }
-
-/* Indicador de estado como etiqueta técnica */
+/* PLAYER (SIDEBAR) */
+.player-info { text-align: center; margin-bottom: 2rem; }
 .status-indicator {
-  font-family: var(--font-mono);
-  font-size: 0.7rem; 
-  background: rgba(255,255,255,0.05);
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: var(--text-muted);
-  display: inline-block; margin-bottom: 1.5rem;
-  letter-spacing: 0.1em;
+  font-family: var(--font-mono); font-size: 0.65rem; 
+  background: var(--input-bg); padding: 4px 8px; border-radius: 4px;
+  color: var(--text-muted); display: inline-block; margin-bottom: 1rem; letter-spacing: 0.1em;
+  border: 1px solid transparent;
 }
-
 .status-indicator.live { 
-  background: rgba(0, 240, 255, 0.1);
-  color: var(--accent); 
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  box-shadow: 0 0 15px var(--accent-glow);
+  color: var(--accent); border-color: var(--accent-dim);
+  box-shadow: 0 0 10px var(--accent-dim);
 }
 
-/* TÍTULO GRANDE. JERARQUÍA. */
-.track-title { 
-  margin: 0; font-size: 2.2rem; font-weight: 800; 
-  line-height: 1.1; letter-spacing: -0.03em;
-  color: #fff;
-}
+.track-title { margin: 0; font-size: 1.8rem; font-weight: 800; line-height: 1.1; color: var(--text-main); }
+.track-artist { margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; font-family: var(--font-display); }
 
-.track-artist { 
-  margin: 0.8rem 0 0; color: var(--text-muted); 
-  font-size: 1rem; font-weight: 500;
-}
-
-.custom-controls { margin-top: 3rem; }
-
-/* Botón Play Minimalista y Potente */
 .play-btn {
-  width: 90px; height: 90px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #000;
-  border: none;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-bottom: 2rem;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--accent); color: #000; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); margin: 0 auto 2rem;
+  box-shadow: 0 0 0 4px var(--bg-deep); /* Ring effect */
 }
-.play-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--accent-glow); }
-.play-btn:active { transform: scale(0.95); }
-.play-btn svg { width: 36px; height: 36px; fill: #000; }
+.play-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--accent-glow); }
+.play-btn svg { width: 32px; height: 32px; fill: #000; }
 
-/* Slider refinado */
-.volume-control svg { width: 18px; color: var(--text-muted); }
+.volume-control { display: flex; align-items: center; gap: 10px; color: var(--text-muted); }
 input[type=range] {
-  -webkit-appearance: none; width: 100%; height: 4px;
-  background: rgba(255,255,255,0.1); border-radius: 2px;
+  flex: 1; -webkit-appearance: none; height: 4px; background: var(--border-subtle); border-radius: 2px;
 }
 input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; height: 12px; width: 12px;
-  border-radius: 50%; background: var(--text-main);
-  margin-top: -4px; transition: transform 0.1s;
+  -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%;
+  background: var(--text-main); cursor: pointer; transition: 0.1s;
 }
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.5); background: var(--accent); }
+input[type=range]::-webkit-slider-thumb:hover { background: var(--accent); transform: scale(1.2); }
 
-/* =========================
-   FILTROS (Estilo Formulario Técnico)
-   ========================= */
-.filters { margin-top: 2rem; }
-.filters-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.filters-header h3 { margin: 0; font-size: 1rem; color: var(--text-main); }
-.btn-text { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+/* FILTROS (INPUTS) */
+.filters-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.filters-header h3 { font-size: 0.9rem; margin: 0; color: var(--text-main); }
+.btn-text { background: none; border: none; color: var(--accent); font-size: 0.75rem; cursor: pointer; text-transform: uppercase; font-weight: 700; }
 
-.input-label { 
-  font-family: var(--font-mono); font-size: 0.75rem; 
-  color: var(--text-muted); margin-bottom: 0.5rem; display: block;
+.input-label { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; display: block; }
+.input-dark, .theme-select {
+  background: var(--input-bg); border: 1px solid var(--border-subtle);
+  color: var(--text-main); padding: 0.7rem; border-radius: 4px;
+  width: 100%; outline: none; font-family: var(--font-display); font-size: 0.9rem;
+  transition: var(--transition);
 }
+.input-dark:focus, .theme-select:focus { border-color: var(--accent); }
 
-.input-dark {
-  background: var(--bg-deep); 
-  border: 1px solid var(--border-subtle);
-  color: #fff; padding: 0.8rem 1rem; border-radius: 6px;
-  width: 100%; outline: none; font-family: inherit; font-size: 0.9rem;
-  transition: all 0.2s;
+/* --- TOOLBAR PRINCIPAL (NUEVO) --- */
+.panel-toolbar {
+  display: flex; gap: 1rem; margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;
 }
-.input-dark:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-dim); }
+@media(max-width: 600px) { .panel-toolbar { flex-direction: column; } }
 
-.separator { border-top: 1px solid var(--border-subtle); opacity: 1; margin: 2rem 0; }
+.search-wrap { flex: 1; position: relative; display: flex; align-items: center; }
+.search-icon { position: absolute; left: 12px; color: var(--text-muted); }
+.input-transparent {
+  width: 100%; background: var(--input-bg); border: 1px solid var(--border-subtle);
+  border-radius: 4px; padding: 0.7rem 0.7rem 0.7rem 2.5rem;
+  color: var(--text-main); outline: none; font-family: var(--font-display);
+}
+.input-transparent:focus { border-color: var(--accent); }
 
-/* =========================
-   GRID DE ESTACIONES (Funcionalidad > Trucos)
-   ========================= */
-.panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.panel-head h3 { font-size: 1.5rem; margin: 0; letter-spacing: -0.02em; }
+.view-controls { display: flex; align-items: center; gap: 8px; }
+.divider-v { width: 1px; height: 24px; background: var(--border-subtle); margin: 0 8px; }
 
-.search-input { min-width: 300px; }
+.theme-select { width: auto; font-size: 0.8rem; padding: 0.5rem 2rem 0.5rem 0.8rem; cursor: pointer; }
 
+.icon-btn {
+  background: transparent; border: 1px solid transparent; color: var(--text-muted);
+  width: 36px; height: 36px; border-radius: 4px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: var(--transition);
+}
+.icon-btn:hover { color: var(--text-main); background: var(--border-subtle); }
+.icon-btn.active { color: #000; background: var(--accent); border-color: var(--accent); }
+
+.sub-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.panel-title { font-size: 1.1rem; margin: 0; font-weight: 700; }
+.switch-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.switch-text { font-family: var(--font-display); font-weight: 700; font-size: 0.75rem; color: var(--text-muted); }
+
+/* --- GRID SYSTEM --- */
 .station-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
+  display: grid; gap: 1rem;
 }
 
-/* Tarjeta Profesional - Sin linternas absurdas */
+/* MODO GRID (Defecto) */
+.station-grid.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+/* MODO LISTA (Nuevo) */
+.station-grid.list-view {
+  grid-template-columns: 1fr;
+}
+
+/* STATION CARD */
 .station-card {
-  background: rgba(255,255,255,0.02);
+  background: var(--input-bg);
   border: 1px solid var(--border-subtle);
-  padding: 1.2rem; border-radius: 8px;
-  cursor: pointer;
+  padding: 1rem; border-radius: 6px;
+  cursor: pointer; position: relative;
   display: flex; align-items: center; justify-content: space-between;
-  transition: all 0.2s ease;
-  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-/* Hover: Elevación y borde limpio */
-.station-card:hover { 
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.2);
-  transform: translateY(-2px);
-}
+.station-grid.grid-view .station-card { flex-direction: column; align-items: flex-start; gap: 1rem; }
+.station-grid.list-view .station-card { flex-direction: row; gap: 1rem; }
 
-/* Estado Activo: Borde brillante y fondo sutil */
+.station-card:hover { border-color: var(--text-muted); transform: translateY(-2px); }
+
+/* ESTADO ACTIVO */
 .station-card.active {
-  background: rgba(0, 240, 255, 0.05);
+  background: linear-gradient(90deg, var(--accent-dim) 0%, transparent 100%);
   border-color: var(--accent);
+  box-shadow: inset 2px 0 0 0 var(--accent); /* Borde sólido izquierdo via shadow */
 }
 
-.st-info { display: flex; align-items: center; gap: 1rem; }
-
+.st-info { display: flex; align-items: center; gap: 1rem; width: 100%; }
 .st-icon {
-  width: 40px; height: 40px; border-radius: 4px;
-  background: #1a1e26; display: flex; align-items: center; justify-content: center;
-  font-size: 0.8rem; color: #fff; font-weight: bold;
+  width: 36px; height: 36px; border-radius: 4px; flex-shrink: 0;
+  background: var(--bg-deep); border: 1px solid var(--border-subtle);
+  display: grid; place-items: center;
+  font-size: 0.75rem; color: var(--text-main); font-weight: 800;
 }
-/* Insignias de región como puntos de color sutiles */
-.badge-sudamerica { border-left: 2px solid #ff5252; }
-.badge-europa { border-left: 2px solid #448aff; }
-.badge-norteamerica { border-left: 2px solid #69f0ae; }
-.badge-default { border-left: 2px solid #9e9e9e; }
+.st-text { display: flex; flex-direction: column; overflow: hidden; }
+.st-name { font-weight: 700; font-size: 0.9rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
-.st-name { font-weight: 700; font-size: 0.95rem; display: block; color: var(--text-main); }
-.st-meta { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
-
-/* Visualizer Simplificado */
-.visualizer { display: flex; gap: 2px; height: 12px; align-items: flex-end; opacity: 0; }
+/* VISUALIZER (Arreglado) */
+.visualizer { display: flex; gap: 3px; height: 16px; align-items: flex-end; opacity: 0; transition: opacity 0.3s; }
 .station-card.active .visualizer { opacity: 1; }
-.bar { width: 2px; background: var(--accent); animation: bounce 0s infinite alternate; }
 
-.fav-btn {
-  background: none; border: none; color: #333; font-size: 1.2rem; cursor: pointer;
-  transition: color 0.2s;
+@keyframes sound-bounce {
+  0% { height: 20%; }
+  50% { height: 100%; }
+  100% { height: 20%; }
 }
-.fav-btn:hover { color: #fff; }
+
+.bar { width: 3px; background: var(--accent); border-radius: 2px; }
+/* La animación solo corre si la tarjeta está activa para ahorrar CPU */
+.station-card.active .bar { animation: sound-bounce 0.8s infinite ease-in-out; }
+.station-card.active .bar:nth-child(1) { animation-delay: 0.0s; }
+.station-card.active .bar:nth-child(2) { animation-delay: 0.2s; }
+.station-card.active .bar:nth-child(3) { animation-delay: 0.4s; }
+
+.fav-btn { background: none; border: none; color: var(--border-subtle); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+.fav-btn:hover { color: var(--text-main); }
 .fav-btn.is-fav { color: var(--accent); }
 
-/* =========================
-   FOOTER
-   ========================= */
-.site-footer {
-  text-align: center; padding: 3rem; color: var(--text-muted);
-  font-family: var(--font-mono); font-size: 0.7rem; opacity: 0.5;
-}
-
-/* Ocultar elementos visuales innecesarios del tema anterior */
-body[data-theme="gold"], body[data-theme="purple"] {
-  /* Reset a valores por defecto o definir nuevas variables si las necesitas, 
-     pero por ahora limpiamos la lógica */
-  --accent: #ffd700;
-}
+/* FOOTER */
+.site-footer { text-align: center; padding: 2rem; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.7rem; opacity: 0.6; }
