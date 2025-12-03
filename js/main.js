@@ -1,5 +1,5 @@
 // =======================
-// SYSTEM CONFIG v3.5 (SECURE & STABLE)
+// SYSTEM CONFIG v3.6 (AUTO-FILTER PERFECTED)
 // =======================
 
 const stations = [
@@ -17,7 +17,7 @@ const stations = [
   { name: "Radio PBO", country: "Perú", region: "Sudamérica", url: "https://stream.radiojar.com/2fse67zuv8hvv" },
   { name: "Radio Inca", country: "Perú", region: "Sudamérica", url: "https://stream.zeno.fm/b9x47pyk21zuv" },
 
-  // ====== PERÚ – REGIONAL (Solo HTTPS) ======
+  // ====== PERÚ – REGIONAL (Solo HTTPS Seguros) ======
   { name: "Radio Santa Lucía", country: "Perú", region: "Sudamérica", url: "https://sp.dattavolt.com/8014/stream" },
   { name: "Radio Pampa Yurac", country: "Perú", region: "Sudamérica", url: "https://rr5200.globalhost1.com/8242/stream" },
   { name: "Radio Stereo TV", country: "Perú", region: "Sudamérica", url: "https://sp.onliveperu.com:7048/stream" },
@@ -84,14 +84,26 @@ const els = {
 const init = () => {
   if(!els.list) return;
   
-  // Cargar Tema
+  // 1. Cargar Tema
   const savedTheme = localStorage.getItem("ultra_theme") || "default";
   setTheme(savedTheme);
   if(els.themeSelect) els.themeSelect.value = savedTheme;
 
+  // 2. Generar Filtros Dinámicamente
   loadFilters();
+  
+  // 3. Forzar Reset de Filtros (CRÍTICO: Evita caché del navegador)
+  els.search.value = "";
+  els.region.value = "Todas";
+  els.country.value = "Todos";
+  els.favToggle.checked = false;
+
+  // 4. Inicializar Volumen Visual
   updateVolumeVisuals(els.volSlider.value);
+  
+  // 5. Renderizar Lista Completa
   renderList();
+  
   setupListeners();
 };
 
@@ -116,6 +128,7 @@ const hapticFeedback = (type) => {
 const renderList = () => {
   els.list.innerHTML = "";
   
+  // Normalización para búsqueda insensible a acentos/mayúsculas
   const term = els.search.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const region = els.region.value;
   const country = els.country.value;
@@ -123,14 +136,17 @@ const renderList = () => {
 
   const filtered = stations.filter(st => {
     const matchSearch = !term || st.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(term);
+    
+    // Lógica Estricta: "Todas" muestra todo, sino busca coincidencia exacta
     const matchRegion = region === "Todas" || st.region === region;
     const matchCountry = country === "Todos" || st.country === country;
     const matchFav = !showFavs || favorites.has(st.name);
+    
     return matchSearch && matchRegion && matchCountry && matchFav;
   });
 
   if (filtered.length === 0) {
-    els.list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-muted)">Sin señal detectada.</div>`;
+    els.list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted); font-size:0.9rem;">Sin señal detectada.</div>`;
     return;
   }
 
@@ -138,8 +154,6 @@ const renderList = () => {
     const isActive = currentStation && currentStation.name === st.name;
     const isFav = favorites.has(st.name);
     const badgeClass = regionClassMap[st.region] || "badge-default";
-    
-    // Animar solo si activo + reproduciendo
     const animatingClass = (isActive && isPlaying) ? 'animating' : '';
 
     const div = document.createElement("div");
@@ -164,12 +178,12 @@ const renderList = () => {
       </div>
     `;
 
+    // Click en tarjeta (Play)
     div.onclick = (e) => {
-      if(!e.target.closest('.fav-btn')) {
-        playStation(st);
-      }
+      if(!e.target.closest('.fav-btn')) playStation(st);
     };
 
+    // Click en Favorito
     const btnFav = div.querySelector('.fav-btn');
     btnFav.onclick = (e) => {
       e.stopPropagation();
@@ -177,7 +191,7 @@ const renderList = () => {
       if(favorites.has(st.name)) favorites.delete(st.name);
       else favorites.add(st.name);
       localStorage.setItem("ultra_favs", JSON.stringify([...favorites]));
-      renderList();
+      renderList(); // Re-render para actualizar estado visual
     };
 
     els.list.appendChild(div);
@@ -248,10 +262,10 @@ const setPlayingState = (playing) => {
 };
 
 // =======================
-// FILTERS & EVENTS
+// FILTERS & EVENTS (DINÁMICO)
 // =======================
 const loadFilters = () => {
-  // Se generan dinámicamente de la lista segura
+  // Extrae automáticamente Regiones y Países únicos de la lista
   const regions = ["Todas", ...new Set(stations.map(s => s.region))].sort();
   const countries = ["Todos", ...new Set(stations.map(s => s.country))].sort();
   
@@ -288,15 +302,18 @@ const setupListeners = () => {
     localStorage.setItem("ultra_theme", e.target.value);
   });
 
+  // Eventos de Filtrado
   [els.search, els.region, els.country].forEach(el => el.addEventListener("input", renderList));
   els.favToggle.addEventListener("change", renderList);
 
+  // Botón Reset
   els.clearFilters.addEventListener("click", () => {
     els.search.value = "";
     els.region.value = "Todas";
     els.country.value = "Todos";
     els.favToggle.checked = false;
     renderList();
+    hapticFeedback('light');
   });
 };
 
