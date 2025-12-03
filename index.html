@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#05070a">
   
-  <link rel="manifest" href="manifest.json"> 
-  
-  <title>Radio Satelital | Ultra Interface v6.3</title>
+  <title>Radio Satelital | Ultra Interface v6.4</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css" />
+  
+  <link rel="stylesheet" href="css/style.css?v=6.4" />
 </head>
 
 <body class="page">
@@ -24,7 +23,7 @@
         <div class="brand-icon"><div class="brand-wave"></div></div>
         <div class="brand-text">
           <h1 class="site-title">Satelital</h1>
-          <p class="site-subtitle">Wave Player v6.3</p>
+          <p class="site-subtitle">Wave Player v6.4</p>
         </div>
       </div>
     </div>
@@ -46,11 +45,9 @@
 
             <div class="stats-row" id="statsRow" style="opacity:0">
               <div class="stat-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 <span id="listenerCount">0</span>
               </div>
               <div class="stat-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                 <span id="likeCount">0</span>
               </div>
             </div>
@@ -60,12 +57,9 @@
           <audio id="radioPlayer" preload="none" class="sr-only" crossorigin="anonymous"></audio>
 
           <div class="custom-controls">
-            
             <div class="control-group">
               <button id="btnPrev" class="sec-btn" aria-label="Anterior">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
               </button>
 
               <button id="btnPlay" class="btn-control play-btn" aria-label="Reproducir">
@@ -74,31 +68,13 @@
               </button>
 
               <button id="btnNext" class="sec-btn" aria-label="Siguiente">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                </svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
               </button>
             </div>
 
             <div class="volume-control">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93L15.54 8.46a5 5 0 0 1 0 7.07l3.53 3.53"/></svg>
               <input type="range" id="volSlider" min="0" max="1" step="0.01" value="1">
             </div>
-
-          </div>
-          
-          <div class="player-waves-container">
-            <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-            viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-              <defs>
-                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-              </defs>
-              <g class="parallax">
-                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(0, 230, 118, 0.5)" />
-                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(0, 230, 118, 0.3)" />
-                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(0, 230, 118, 0.1)" />
-              </g>
-            </svg>
           </div>
         </section>
 
@@ -107,10 +83,10 @@
             <h3>Agregar Frecuencia</h3>
           </div>
           <form id="addStationForm" class="mini-form">
-            <input type="text" id="newStationName" placeholder="Nombre de Radio" required class="input-dark mini">
+            <input type="text" id="newStationName" placeholder="Nombre" required class="input-dark mini">
             <input type="text" id="newStationCountry" placeholder="País" required class="input-dark mini">
-            <input type="url" id="newStationUrl" placeholder="URL Stream (HTTPS)" required class="input-dark mini">
-            <button type="submit" class="btn-action">Guardar Señal</button>
+            <input type="url" id="newStationUrl" placeholder="URL (HTTPS)" required class="input-dark mini">
+            <button type="submit" class="btn-action">Guardar</button>
           </form>
         </section>
 
@@ -153,6 +129,7 @@
             <span class="switch-text">Prioridad Favoritos</span>
           </label>
         </div>
+        
         <div id="stationList" class="station-grid"></div>
       </section>
 
@@ -163,87 +140,25 @@
     <p>&copy; 2025 Radio Satelital · Community Core</p>
   </footer>
 
+  <script src="js/stations.js?v=6.4"></script>
+  
   <script>
-    const defaultStations = [
-      // ====== PERÚ (Existentes y Nuevas) ======
-      { name: "Radio Moda", country: "Perú", region: "Sudamérica", url: "https://25023.live.streamtheworld.com/CRP_MOD_SC" },
-      { name: "Ritmo Romántica", country: "Perú", region: "Sudamérica", url: "https://25103.live.streamtheworld.com/CRP_RIT_SC" },
-      { name: "Onda Cero", country: "Perú", region: "Sudamérica", url: "https://mdstrm.com/audio/6598b65ab398c90871aff8cc/icecast.audio" },
-      { name: "La Zona", country: "Perú", region: "Sudamérica", url: "https://mdstrm.com/audio/5fada54116646e098d97e6a5/icecast.audio" },
-      { name: "Radio Corazón", country: "Perú", region: "Sudamérica", url: "https://mdstrm.com/audio/5fada514fc16c006bd63370f/icecast.audio" },
-      { name: "La Inolvidable", country: "Perú", region: "Sudamérica", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/CRP_LI_SC" },
-      { name: "Radio Mágica", country: "Perú", region: "Sudamérica", url: "https://26513.live.streamtheworld.com/MAG_AAC_SC" },
-      { name: "Radiomar", country: "Perú", region: "Sudamérica", url: "https://24873.live.streamtheworld.com/CRP_MARAAC_SC" },
-      { name: "RPP Noticias", country: "Perú", region: "Sudamérica", url: "https://mdstrm.com/audio/5fab3416b5f9ef165cfab6e9/icecast.audio" },
-      { name: "Exitosa Noticias", country: "Perú", region: "Sudamérica", url: "https://neptuno-2-audio.mediaserver.digital/79525baf-b0f5-4013-a8bd-3c5c293c6561" },
-      { name: "Radio PBO", country: "Perú", region: "Sudamérica", url: "https://stream.radiojar.com/2fse67zuv8hvv" },
-      { name: "Radio Inca", country: "Perú", region: "Sudamérica", url: "https://stream.zeno.fm/b9x47pyk21zuv" },
-      { name: "Radio Turbo Mix", country: "Perú", region: "Sudamérica", url: "https://serverssl.innovatestream.pe:8080/167.114.118.120:7624/stream" },
-      { name: "Radio Fuego", country: "Perú", region: "Sudamérica", url: "https://serverssl.innovatestream.pe:8080/sp.onliveperu.com:8128/" },
-      { name: "Radio Andina", country: "Perú", region: "Sudamérica", url: "https://serverssl.innovatestream.pe:8080/http://167.114.118.120:7058/;stream" },
-      { name: "Radio Ilucan", country: "Perú", region: "Sudamérica", url: "https://serverssl.innovatestream.pe:8080/167.114.118.120:7820/;stream" },
-      { name: "Radio Abba Padre", country: "Perú", region: "Sudamérica", url: "https://stream-175.zeno.fm/6rrwumthg6quv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiI2cnJ3dW10aGc2cXV2IiwiaG9zdCI6InN0cmVhbS0xNzUuemVuby5mbSIsInJ0dGwiOjUsImp0aSI6Im9XY2g3dmlTU0NHYlVGQ0QtZmNxUFEiLCJpYXQiOjE3NjQ3OTMwNDksImV4cCI6MTc2NDc5MzEwOX0.U3kdYbFm_XjuESzU_aSQ7owwkG9ScWV9h4fLn36I88U" },
-      { name: "Radio ABN", country: "Perú", region: "Sudamérica", url: "https://jml-stream.com/radio/8000/radio.mp3" },
-
-      // ====== REGIONALES HTTPS (Perú) ======
-      { name: "Radio Santa Lucía", country: "Perú", region: "Sudamérica", url: "https://sp.dattavolt.com/8014/stream" },
-      { name: "Radio Pampa Yurac", country: "Perú", region: "Sudamérica", url: "https://rr5200.globalhost1.com/8242/stream" },
-      { name: "Radio Stereo TV", country: "Perú", region: "Sudamérica", url: "https://sp.onliveperu.com:7048/stream" },
-      { name: "Radio La Kuadra", country: "Perú", region: "Sudamérica", url: "https://dattavolt.com/8046/stream" },
-      { name: "Radio Frecuencia", country: "Perú", region: "Sudamérica", url: "https://conectperu.com/8384/stream" },
-      { name: "Onda Popular (Lima)", country: "Perú", region: "Sudamérica", url: "https://envivo.top:8443/am" },
-      { name: "Onda Popular (Juliaca)", country: "Perú", region: "Sudamérica", url: "https://dattavolt.com/8278/stream" },
-      { name: "Radio Nor Andina", country: "Perú", region: "Sudamérica", url: "https://mediastreamm.com/8012/stream/1/" },
-      { name: "Radio Bambamarca", country: "Perú", region: "Sudamérica", url: "https://envivo.top:8443/lider" },
-      { name: "Radio Continente", country: "Perú", region: "Sudamérica", url: "https://sonic6.my-servers.org/10170/" },
-      { name: "La Cheverísima", country: "Perú", region: "Sudamérica", url: "https://sp.onliveperu.com:8114/stream" },
-      { name: "Radio TV El Shaddai", country: "Perú", region: "Sudamérica", url: "https://stream.zeno.fm/ppr5q4q3x1zuv" },
-      { name: "Radio Inica Digital", country: "Perú", region: "Sudamérica", url: "https://stream.zeno.fm/487vgx80yuhvv" },
-      { name: "Radio La Falsa", country: "Perú", region: "Sudamérica", url: "https://stream.zeno.fm/b9x47pyk21zuv" },
-      { name: "Radio Activa", country: "Perú", region: "Sudamérica", url: "https://sp.onliveperu.com:8108/stream" },
-      { name: "Radio Mía", country: "Perú", region: "Sudamérica", url: "https://streaming.zonalatinaeirl.com:8020/radio" },
-      { name: "Radio Patrón", country: "Perú", region: "Sudamérica", url: "https://streaming.zonalatinaeirl.com:8010/radio" },
-      { name: "Radio TV Sureña", country: "Perú", region: "Sudamérica", url: "https://stream.zeno.fm/p7d5fpx4xnhvv" },
-      { name: "Radio Enamorados", country: "Perú", region: "Sudamérica", url: "https://stream.zeno.fm/gnybbqc1fnruv" },
-
-      // ====== INTERNACIONAL Y LATINOAMÉRICA (Agregadas) ======
-      { name: "Radio ABC (San Luis)", country: "México", region: "Norteamérica", url: "https://16643.live.streamtheworld.com/XHCZFM.mp3" },
-      { name: "Radio ABC (Taxco)", country: "México", region: "Norteamérica", url: "https://streaming.servicioswebmx.com/8288/stream" },
-      { name: "ABC 760", country: "México", region: "Norteamérica", url: "https://streamingcwsradio30.com/8292/stream" },
-      { name: "ABC Radio Puebla", country: "México", region: "Norteamérica", url: "https://streaming.servicioswebmx.com/8264/stream" },
-      { name: "Radio Acceso Total", country: "México", region: "Norteamérica", url: "https://us10a.serverse.com/proxy/acce8712?mp=/;" },
-      { name: "Ach Kuxlejal 100.3", country: "México", region: "Norteamérica", url: "https://stream-178.zeno.fm/md6tfkaaechvv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJtZDZ0ZmthYWVjaHZ2IiwiaG9zdCI6InN0cmVhbS0xNzguemVuby5mbSIsInJ0dGwiOjUsImp0aSI6IkI4TUMzLXR3UTR1Q1VzbXY2M0gwUFEiLCJpYXQiOjE3NjQ3OTQ4MTksImV4cCI6MTc2NDc5NDg3OX0.xBJOxw_oGdW4sqNsL4n9WyUeK6CTvzAY8o5i5MjLe78" },
-      
-      { name: "ABC 94.7", country: "Argentina", region: "Sudamérica", url: "https://stream-176.zeno.fm/n03jc4xoy63tv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJuMDNqYzR4b3k2M3R2IiwiaG9zdCI6InN0cmVhbS0xNzYuemVuby5mbSIsInJ0dGwiOjUsImp0aSI6Im9aa3kyRHRvUXBDU3kwNUF2OGdPX3ciLCJpYXQiOjE3NjQ3OTM2MzksImV4cCI6MTc2NDc5MzY5OX0.clgYVIm4DHZtHwGTjXdSfYi0SjVgGWj8UkiZEBz3yg0" },
-      { name: "Estéreo Abejorral", country: "Colombia", region: "Sudamérica", url: "https://icecasthd.net/proxy/abejorral/live" },
-      { name: "Abriendo Surcos", country: "Colombia", region: "Sudamérica", url: "https://djp.sytes.net/public/abriendo_surcos" },
-      { name: "Acacio de Chile", country: "Chile", region: "Sudamérica", url: "https://sonic.portalfoxmix.cl:7057/;" },
-      { name: "Acción FM", country: "Venezuela", region: "Sudamérica", url: "https://stream.intervalohost.com:7008/stream" },
-      { name: "Aclo Chuquisaca", country: "Bolivia", region: "Sudamérica", url: "https://cloudstream2030.conectarhosting.com/8192/stream" },
-      { name: "Aclo tarija", country: "Bolivia", region: "Sudamérica", url: "https://cloudstream2030.conectarhosting.com/8242/stream" },
-      
-      { name: "Radio La Hondureña", country: "Honduras", region: "Centroamérica", url: "https://s2.mkservers.space/rih" },
-      { name: "Abriendo Los Cielos", country: "Honduras", region: "Centroamérica", url: "https://stream-177.zeno.fm/a8uwe88svy8uv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJhOHV3ZTg4c3Z5OHV2IiwiaG9zdCI6InN0cmVhbS0xNzcuemVuby5mbSIsInJ0dGwiOjUsImp0aSI6Ik9VWVRibTdpUVUtQjVhSHFOWUNyX1EiLCJpYXQiOjE3NjQ3OTQwOTQsImV4cCI6MTc2NDc5NDE1NH0.n3CeLd9U7rcF9A9NsPpzFGJJjuPsUoaf2EsUxGah04w" },
-      { name: "Una Radio Viva Voz", country: "Nicaragua", region: "Centroamérica", url: "https://rr5100.globalhost1.com/8006/stream" },
-      
-      { name: "105.3 El Ritmo", country: "EE.UU", region: "Norteamérica", url: "https://n02b-e2.revma.ihrhls.com/zc3209/hls.m3u8?rj-ttl=5&rj-tok=AAABmuXcB-4Ad7qhABJqQGGBcg" },
-      { name: "Acción Cristiana", country: "EE.UU", region: "Norteamérica", url: "https://panel.lifestreammedia.net:8162/stream" },
-
-      // ====== EUROPA (Existentes y Nuevas) ======
-      { name: "RFI Internacional", country: "Francia", region: "Europa", url: "https://rfienespagnol64k.ice.infomaniak.ch/rfienespagnol-64.mp3" },
-      { name: "RFI Español (96k)", country: "Francia", region: "Europa", url: "https://rfiespagnol96k.ice.infomaniak.ch/rfiespagnol-96k.mp3" },
-      { name: "DW Español", country: "Alemania", region: "Europa", url: "https://dwstream6-lh.akamaihd.net/i/dwstream6_live@123544/master.m3u8" },
-      
-      { name: "RNE 5 (España)", country: "España", region: "Europa", url: "https://dispatcher.rndfnk.com/crtve/rne5/main/mp3/high?aggregator=tunein" },
-      { name: "RNE Radio Clásica", country: "España", region: "Europa", url: "https://rnelivestream.rtve.es/rnerc/main/master.m3u8" },
-      { name: "RNE Radio Nacional", country: "España", region: "Europa", url: "https://f141.rndfnk.com/star/crtve/rne1/nav/mp3/128/ct/stream.mp3?cid=01GENZSPVYG0R84NK9E1C77RSZ&sid=36LhA65FiO252hsvxBqzfqiI4HF&token=-FbGT-8Eif8zgFPSMX7ER3TPiwAZ4pI8BsNKr1HldC4&tvf=HsCHLkTgfRhmMTQxLnJuZGZuay5jb20" },
-      { name: "Radio AFRONTAR", country: "España", region: "Europa", url: "https://vigo-copesedes-rrcast.flumotion.com/copesedes/vigo-low.mp3" },
-      { name: "AB 95 FM", country: "España", region: "Europa", url: "https://stream-153.zeno.fm/szskq9dxs98uv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJzenNrcTlkeHM5OHV2IiwiaG9zdCI6InN0cmVhbS0xNTMuemVuby5mbSIsInJ0dGwiOjUsImp0aSI6Ims0M0xwaVpDVE1pRXExWVhvMEpjUmciLCJpYXQiOjE3NjQ3OTI4NjUsImV4cCI6MTc2NDc5MjkyNX0.dpzu-0oLrJ2nsOJU25J8ghjMS2O_2FSyXzntk4rD05A" },
-      { name: "Radio Tele Taxi", country: "España", region: "Europa", url: "https://radiott-web.streaming-pro.com:6103/radiott.mp3" },
-      { name: "Radio ES", country: "España", region: "Europa", url: "https://libertaddigital-radio-live1.flumotion.com/libertaddigital/ld-live1-low.mp3" },
-      { name: "Cadena COPE", country: "España", region: "Europa", url: "https://net1-cope-rrcast.flumotion.com/cope/net1-low.mp3" }
-    ];
+    if (typeof defaultStations === 'undefined') {
+      document.body.innerHTML = `
+        <div style="background:red; color:white; padding:20px; text-align:center; font-family:sans-serif;">
+          <h1>ERROR CRÍTICO DE SISTEMA</h1>
+          <p>El archivo <strong>js/stations.js</strong> no se ha cargado.</p>
+          <ul style="text-align:left; display:inline-block;">
+            <li>Verifica que exista una carpeta llamada <strong>js</strong>.</li>
+            <li>Verifica que dentro esté el archivo <strong>stations.js</strong>.</li>
+            <li>Verifica que stations.js no tenga errores de sintaxis (comas faltantes).</li>
+          </ul>
+        </div>
+      `;
+      throw new Error("Deteniendo ejecución: falta stations.js");
+    }
   </script>
-  <script src="js/main.js"></script>
+
+  <script src="js/main.js?v=6.4"></script>
 </body>
 </html>
