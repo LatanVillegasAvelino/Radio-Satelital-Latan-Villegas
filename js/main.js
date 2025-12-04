@@ -1,6 +1,6 @@
 // js/main.js
 // =======================
-// SYSTEM CONFIG v7.1 (SAFE MODE)
+// SYSTEM CONFIG v7.2 (PWA ENABLED)
 // =======================
 
 const regionClassMap = {
@@ -46,11 +46,9 @@ const els = {
 const init = () => {
   if (typeof defaultStations === 'undefined') {
     console.error("CRITICAL: defaultStations missing.");
-    alert("Error: Archivo de estaciones no cargado.");
     return;
   }
   
-  // Recuperación segura de datos
   try {
     const savedFavs = JSON.parse(localStorage.getItem("ultra_favs") || "[]");
     favorites = new Set(savedFavs);
@@ -62,18 +60,16 @@ const init = () => {
     favorites = new Set();
   }
 
-  // Tema
   const savedTheme = localStorage.getItem("ultra_theme") || "default";
   setTheme(savedTheme);
   if(els.themeSelect) els.themeSelect.value = savedTheme;
 
-  // Renderizado
   loadFilters();
   resetControls();
   renderList();
   setupListeners();
   
-  console.log(`System Ready v7.1`);
+  console.log(`System Ready v7.2`);
 };
 
 const resetControls = () => {
@@ -105,7 +101,6 @@ const playStation = (station) => {
   
   currentStation = station;
   
-  // UI Updates protegidos
   if(els.title) els.title.innerText = station.name;
   if(els.meta) els.meta.innerText = `${station.country} · ${station.region}`;
   if(els.track) els.track.innerText = "Conectando...";
@@ -119,7 +114,6 @@ const playStation = (station) => {
   stopTimer();
   if(els.timer) els.timer.innerText = "00:00";
 
-  // Audio Play con manejo de errores
   try {
       els.player.src = station.url;
       els.player.volume = 1; 
@@ -131,14 +125,12 @@ const playStation = (station) => {
           updateMediaSession();
         }).catch(e => {
           console.error("Playback Failed:", e);
-          if(els.track) els.track.innerText = "Error: Stream Offline/Bloqueado";
+          if(els.track) els.track.innerText = "Offline";
           if(els.status) {
               els.status.innerText = "ERROR";
               els.status.style.color = "#ff3d3d";
           }
           setPlayingState(false);
-          // Alerta visual para depuración
-          // alert("No se puede reproducir: " + e.message); 
         });
       }
   } catch (err) {
@@ -163,7 +155,6 @@ const togglePlay = () => {
 const setPlayingState = (playing) => {
   isPlaying = playing;
   
-  // Clases CSS protegidas
   if(els.btnPlay) {
       if (playing) els.btnPlay.classList.add("playing");
       else els.btnPlay.classList.remove("playing");
@@ -189,9 +180,6 @@ const setPlayingState = (playing) => {
   }
   renderList(); 
 };
-
-// ... Resto de funciones auxiliares (skip, render, filter) sin cambios críticos ...
-// Se mantienen igual que v7.0 pero aseguran que no haya referencias rotas
 
 const skipStation = (direction) => {
   if (stations.length === 0) return;
@@ -276,7 +264,6 @@ const renderList = () => {
   els.list.appendChild(fragment);
 };
 
-// ... Funciones utilitarias standard ...
 const addCustomStation = (e) => {
   e.preventDefault();
   const name = document.getElementById("newStationName").value.trim();
@@ -318,7 +305,7 @@ const updateMediaSession = () => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentStation.name,
       artist: currentStation.country + ' · ' + currentStation.region,
-      album: 'Satelital Wave Player v7.1',
+      album: 'Satelital Wave Player v7.2',
     });
     navigator.mediaSession.setActionHandler('previoustrack', () => skipStation(-1));
     navigator.mediaSession.setActionHandler('nexttrack', () => skipStation(1));
@@ -357,5 +344,36 @@ const setupListeners = () => {
   });
   if(els.addForm) els.addForm.addEventListener("submit", addCustomStation);
 };
+
+// =======================
+// PWA INSTALL LOGIC
+// =======================
+let deferredPrompt;
+const installBtn = document.getElementById('btnInstall');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevenir banner automático
+  e.preventDefault();
+  deferredPrompt = e;
+  // Mostrar botón
+  if(installBtn) installBtn.style.display = 'block';
+});
+
+if(installBtn) {
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to install prompt: ${outcome}`);
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    }
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  if(installBtn) installBtn.style.display = 'none';
+  console.log('PWA Installed');
+});
 
 document.addEventListener("DOMContentLoaded", init);
