@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#05070a">
   
-  <title>Radio Satelital | Ultra Interface v7.1</title>
+  <title>Radio Satelital | Ultra Interface v7.2</title>
   
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/style.css?v=7.1" />
+  <link rel="stylesheet" href="css/style.css?v=7.2" />
 </head>
 
 <body class="page">
@@ -24,7 +24,7 @@
         <div class="brand-icon"><div class="brand-wave"></div></div>
         <div class="brand-text">
           <h1 class="site-title">Satelital</h1>
-          <p class="site-subtitle">Wave Player v7.1</p>
+          <p class="site-subtitle">Wave Player v7.2</p>
         </div>
       </div>
     </div>
@@ -91,7 +91,13 @@
         </section>
 
         <section class="filters glass-panel">
-          <div class="filters-header"><h3>Filtros</h3><button id="clearFilters" class="btn-text">Reset</button></div>
+          <div class="filters-header">
+            <h3>Filtros</h3>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button id="btnInstall" class="btn-text" style="display:none; color: #00e676;">Instalar App</button>
+                <button id="clearFilters" class="btn-text">Reset</button>
+            </div>
+          </div>
           <div class="form-group">
             <select id="themeSelect" class="input-dark">
               <option value="default">Cyber Dark</option>
@@ -126,15 +132,14 @@
   </main>
 
   <footer class="site-footer"><p>&copy; 2025 Radio Satelital</p></footer>
-
-  <script src="js/stations.js?v=7.1"></script>
-  <script src="js/main.js?v=7.1"></script>
+  <script src="js/stations.js?v=7.2"></script>
+  <script src="js/main.js?v=7.2"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('PWA Ready v7.1:', reg.scope))
+          .then(reg => console.log('PWA Ready v7.2:', reg.scope))
           .catch(err => console.error('PWA Error:', err));
       });
     }
