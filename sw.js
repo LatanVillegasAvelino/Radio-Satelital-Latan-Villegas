@@ -1,4 +1,4 @@
-// sw.js
+// sw.js - Service Worker v1
 const CACHE_NAME = 'satelital-v1';
 const urlsToCache = [
   './',
