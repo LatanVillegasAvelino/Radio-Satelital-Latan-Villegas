@@ -1,16 +1,16 @@
 // sw.js
 // =======================
-// SERVICE WORKER v7.3 (EXTERNAL ICONS BYPASS)
+// SERVICE WORKER v7.4 (CASE SENSITIVE FIX)
 // =======================
 
-const CACHE_NAME = 'satelital-ultra-v7.3';
+const CACHE_NAME = 'satelital-ultra-v7.4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './css/style.css',
+  // CRÍTICO: Ajustado a 'CSS' mayúscula para coincidir con tu carpeta en GitHub
+  './CSS/style.css', 
   './js/main.js',
   './js/stations.js'
-  // Nota: Hemos quitado manifest.json y los iconos de aquí para evitar errores de red externos
 ];
 
 self.addEventListener('install', (e) => {
@@ -18,7 +18,11 @@ self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
+        // Si uno falla, todo falla. Verifica que los nombres sean EXACTOS.
         return cache.addAll(ASSETS_TO_CACHE);
+      })
+      .catch((err) => {
+        console.error('[SW] Error crítico cacheando archivos:', err);
       })
   );
 });
@@ -29,7 +33,7 @@ self.addEventListener('activate', (e) => {
       return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] Limpiando caché antigua:', key);
+            console.log('[SW] Limpiando versión antigua:', key);
             return caches.delete(key);
           }
         })
