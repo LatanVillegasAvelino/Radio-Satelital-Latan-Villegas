@@ -1,9 +1,9 @@
 // sw.js
 // =======================
-// SERVICE WORKER v6.9 (FORCE UPDATE)
+// SERVICE WORKER v7.0 (FORCE RESET)
 // =======================
 
-const CACHE_NAME = 'satelital-ultra-v6.9';
+const CACHE_NAME = 'satelital-ultra-v7.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -11,14 +11,10 @@ const ASSETS_TO_CACHE = [
   './js/main.js',
   './js/stations.js',
   './manifest.json'
-  // Si tienes iconos, inclúyelos:
-  // './icons/icon-192.png',
-  // './icons/icon-512.png'
 ];
 
-// 1. INSTALACIÓN
 self.addEventListener('install', (e) => {
-  self.skipWaiting(); // Forzar instalación inmediata
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -27,33 +23,27 @@ self.addEventListener('install', (e) => {
   );
 });
 
-// 2. ACTIVACIÓN (Limpieza de caché vieja)
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[Service Worker] Eliminando caché antigua:', key);
+            console.log('[SW] Eliminando caché antigua:', key);
             return caches.delete(key);
           }
         })
       );
     })
-    .then(() => self.clients.claim()) // Tomar control inmediatamente
+    .then(() => self.clients.claim())
   );
 });
 
-// 3. FETCH
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(e.request);
+      return cachedResponse || fetch(e.request);
     })
   );
 });
