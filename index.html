@@ -4,12 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#05070a">
-  <title>Radio Satelital | Ultra Interface v7.0</title>
+  
+  <title>Radio Satelital | Ultra Interface v7.1</title>
+  
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=7.0" />
+  
+  <link rel="stylesheet" href="css/style.css?v=7.1" />
 </head>
 
 <body class="page">
@@ -21,7 +24,7 @@
         <div class="brand-icon"><div class="brand-wave"></div></div>
         <div class="brand-text">
           <h1 class="site-title">Satelital</h1>
-          <p class="site-subtitle">Wave Player v7.0</p>
+          <p class="site-subtitle">Wave Player v7.1</p>
         </div>
       </div>
     </div>
@@ -123,14 +126,15 @@
   </main>
 
   <footer class="site-footer"><p>&copy; 2025 Radio Satelital</p></footer>
-  <script src="js/stations.js?v=7.0"></script>
-  <script src="js/main.js?v=7.0"></script>
+
+  <script src="js/stations.js?v=7.1"></script>
+  <script src="js/main.js?v=7.1"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('PWA Ready:', reg.scope))
+          .then(reg => console.log('PWA Ready v7.1:', reg.scope))
           .catch(err => console.error('PWA Error:', err));
       });
     }
