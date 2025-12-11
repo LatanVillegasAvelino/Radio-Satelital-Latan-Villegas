@@ -260,10 +260,34 @@ body[data-theme="amoled"] .ambient-bg { display: none; }
 
 .st-info { display: flex; align-items: center; gap: 14px; overflow: hidden; flex: 1; }
 .st-icon { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; background: #333; }
-.badge-sudamerica { background: linear-gradient(135deg, #e53935, #b71c1c); }
-.badge-europa { background: linear-gradient(135deg, #1976d2, #0d47a1); }
-.badge-norteamerica { background: linear-gradient(135deg, #388e3c, #1b5e20); }
-.badge-default { background: linear-gradient(135deg, #757575, #424242); }
+
+/* GRADIENTES CYBER-NEON POR PAÍS (Nuevos colores "bonitos" para los círculos) */
+/* EUROPA */
+.badge-spain { background: linear-gradient(135deg, #E53935, #B71C1C); border: 2px solid #E53935; } 
+.badge-france { background: linear-gradient(135deg, #1565C0, #0D47A1); border: 2px solid #1565C0; } 
+.badge-germany { background: linear-gradient(135deg, #616161, #212121); border: 2px solid #FFEB3B; } 
+
+/* NORTEAMÉRICA Y CENTROAMÉRICA */
+.badge-usa { background: linear-gradient(135deg, #00C853, #00A643); border: 2px solid #00C853; } 
+.badge-mexico { background: linear-gradient(135deg, #FF9800, #F57C00); border: 2px solid #FF9800; } 
+.badge-puertorico { background: linear-gradient(135deg, #F06292, #E91E63); border: 2px solid #F06292; } 
+.badge-honduras { background: linear-gradient(135deg, #03A9F4, #0277BD); border: 2px solid #03A9F4; } 
+.badge-nicaragua { background: linear-gradient(135deg, #C2185B, #880E4F); border: 2px solid #C2185B; } 
+.badge-costarica { background: linear-gradient(135deg, #7E57C2, #5E35B1); border: 2px solid #7E57C2; } 
+.badge-elsalvador { background: linear-gradient(135deg, #4CAF50, #2E7D32); border: 2px solid #4CAF50; } 
+.badge-guatemala { background: linear-gradient(135deg, #9C27B0, #7B1FA2); border: 2px solid #9C27B0; } 
+
+/* SUDAMÉRICA */
+.badge-peru { background: linear-gradient(135deg, #FFD700, #FFC107); border: 2px solid #FFD700; } 
+.badge-argentina { background: linear-gradient(135deg, #4DD0E1, #00BCD4); border: 2px solid #4DD0E1; } 
+.badge-chile { background: linear-gradient(135deg, #E64A19, #BF360C); border: 2px solid #E64A19; } 
+.badge-colombia { background: linear-gradient(135deg, #FFEB3B, #FFC107); border: 2px solid #FFEB3B; } 
+.badge-bolivia { background: linear-gradient(135deg, #5D4037, #3E2723); border: 2px solid #FF9800; } 
+.badge-venezuela { background: linear-gradient(135deg, #0D47A1, #1976D2); border: 2px solid #0D47A1; } 
+.badge-ecuador { background: linear-gradient(135deg, #8BC34A, #689F38); border: 2px solid #8BC34A; } 
+
+/* DEFAULT Y CUSTOM (Manteniendo los colores de default y custom) */
+.badge-default { background: linear-gradient(135deg, #757575, #424242); border: 2px solid #9E9E9E; }
 .badge-custom { background: linear-gradient(135deg, #9c27b0, #6a1b9a); border: 2px solid #fff; }
 
 .st-name { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; color: var(--text-main); }
