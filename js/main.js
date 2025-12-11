@@ -3,13 +3,27 @@
 // SYSTEM CONFIG v7.3 (PWA ENABLED - A11Y PATCHED)
 // =======================
 
-const regionClassMap = {
-  "Sudamérica": "badge-sudamerica", 
-  "Europa": "badge-europa",
-  "Norteamérica": "badge-norteamerica", 
-  "Centroamérica": "badge-norteamerica",
-  "Internacional": "badge-default", 
-  "Custom": "badge-custom"
+// MAPA DE ASIGNACIÓN DE CLASES DE COLOR POR PAÍS (Implementación de la solicitud)
+const countryClassMap = {
+  "España": "badge-spain", 
+  "Francia": "badge-france",
+  "Alemania": "badge-germany",
+  "EE.UU": "badge-usa",
+  "Honduras": "badge-honduras",
+  "Nicaragua": "badge-nicaragua",
+  "Perú": "badge-peru",
+  "Argentina": "badge-argentina",
+  "Chile": "badge-chile",
+  "Colombia": "badge-colombia",
+  "Bolivia": "badge-bolivia",
+  "Venezuela": "badge-venezuela",
+  "Guatemala": "badge-guatemala",
+  "Ecuador": "badge-ecuador",
+  "El Salvador": "badge-elsalvador",
+  "Costa Rica": "badge-costarica",
+  "Puerto Rico": "badge-puertorico",
+  "México": "badge-mexico",
+  "Custom": "badge-custom" 
 };
 
 let stations = [];
@@ -223,7 +237,10 @@ const renderList = () => {
   filtered.forEach(st => {
     const isActive = currentStation && currentStation.name === st.name;
     const isFav = favorites.has(st.name);
-    const badgeClass = regionClassMap[st.region] || "badge-default";
+    
+    // ASIGNACIÓN DE CLASE POR PAÍS: usa countryClassMap en lugar de regionClassMap
+    const badgeClass = countryClassMap[st.country] || "badge-default"; 
+    
     const animatingClass = (isActive && isPlaying) ? 'animating' : '';
 
     const div = document.createElement("div");
