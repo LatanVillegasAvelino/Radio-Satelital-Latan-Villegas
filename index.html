@@ -6,35 +6,37 @@
   <meta name="description" content="Radio Satelital: Escucha emisoras de radio en vivo. Música, noticias y streaming optimizado." />
   <meta name="theme-color" content="#05070a">
   
-  <title>Radio Satelital | Ultra Interface v7.8</title>
+  <title>Radio Satelital | Ultra Interface v7.5</title>
   
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/style.css?v=7.8" />
+  <link rel="stylesheet" href="css/style.css?v=7.5" />
 </head>
 
 <body class="page">
   <div class="ambient-bg"></div>
 
-  <!-- CAPA OSCURA -->
+  <!-- CAPA OSCURA DE FONDO PARA EL MENÚ -->
   <div class="menu-overlay" id="menuOverlay"></div>
 
-  <!-- MENÚ LATERAL -->
+  <!-- MENÚ LATERAL DESPLEGABLE -->
   <aside class="side-menu" id="sideMenu">
     <div class="menu-header">
       <h3>Menú</h3>
       <button id="btnCloseMenu" class="sec-btn" aria-label="Cerrar menú">
+        <!-- Icono X -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
     </div>
     
     <div class="menu-content">
-      <!-- PERSONALIZACIÓN -->
+      <!-- 1. SECCIÓN PERSONALIZACIÓN (Movida aquí) -->
       <div id="optionsSection" class="menu-panel">
         <div class="panel-head-small"><h3>Personalización</h3></div>
+        
         <div class="opt-group">
           <label class="opt-label">Modo de Color</label>
           <div class="theme-switcher">
@@ -45,6 +47,7 @@
             <button class="theme-btn" data-theme="white" style="background:#f8fafc; border-color:#c62828" aria-label="White Mode"></button>
           </div>
         </div>
+      
         <div class="opt-group">
           <label class="opt-label">Síguenos</label>
           <div class="social-row">
@@ -60,33 +63,42 @@
           </div>
         </div>
       </div>
+
       <hr style="border:0; border-top:1px solid var(--border-glass); margin: 2rem 0;">
-      <!-- AGREGAR FRECUENCIA -->
+
+      <!-- 2. SECCIÓN AGREGAR FRECUENCIA (Movida aquí) -->
       <div class="menu-panel">
         <div class="panel-head-small"><h3>Agregar Frecuencia</h3></div>
         <form id="addStationForm" class="mini-form">
-          <label for="newStationName" class="sr-only">Nombre</label>
+          <label for="newStationName" class="sr-only">Nombre de emisora</label>
           <input type="text" id="newStationName" placeholder="Nombre" required class="input-dark mini">
+          
           <label for="newStationCountry" class="sr-only">País</label>
           <input type="text" id="newStationCountry" placeholder="País" required class="input-dark mini">
-          <label for="newStationUrl" class="sr-only">URL</label>
+          
+          <label for="newStationUrl" class="sr-only">URL de transmisión</label>
           <input type="url" id="newStationUrl" placeholder="URL (HTTPS)" required class="input-dark mini">
+          
           <button type="submit" class="btn-action">Guardar</button>
         </form>
       </div>
     </div>
   </aside>
 
+  <!-- HEADER PRINCIPAL -->
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand-mark">
         <div class="brand-icon"><div class="brand-wave"></div></div>
         <div class="brand-text">
           <h1 class="site-title">Satelital</h1>
-          <p class="site-subtitle">Wave Player v7.8</p>
+          <p class="site-subtitle">Wave Player v7.5</p>
         </div>
       </div>
+      
+      <!-- Botón que ahora abre el MENÚ -->
       <button id="btnOptions" class="sec-btn" aria-label="Abrir Menú">
+        <!-- Icono de Hamburguesa (Menú) -->
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
       </button>
     </div>
@@ -94,8 +106,9 @@
 
   <main id="mainContent" class="site-main">
     <div class="container layout">
+
       <aside class="sidebar">
-        <!-- REPRODUCTOR -->
+        <!-- REPRODUCTOR (Se mantiene visible) -->
         <section class="player-section glass-panel">
           <div class="player-info">
             <span class="status-indicator" id="statusIndicator">Ready</span>
@@ -105,32 +118,25 @@
                 <div class="meta-badge" id="metaBadge" style="display:none">LIVE</div>
             </div>
             
-            <!-- VISUALIZADOR DE AUDIO (NUEVO) -->
             <div class="now-playing-container">
-               <div id="audioVisualizer" class="visualizer hidden">
-                 <div class="bar"></div>
-                 <div class="bar"></div>
-                 <div class="bar"></div>
-                 <div class="bar"></div>
-                 <div class="bar"></div>
-               </div>
-               <p id="streamTrack" class="track-status">Esperando señal...</p>
+               <p id="streamTrack" class="track-artist">Esperando conexión...</p>
             </div>
           </div>
 
           <div id="timerDisplay" class="timer-text">00:00</div>
+          
           <audio id="radioPlayer" preload="none" class="sr-only"></audio>
 
           <div class="custom-controls">
             <div class="control-group">
-              <button id="btnPrev" class="sec-btn" aria-label="Anterior">
+              <button id="btnPrev" class="sec-btn" aria-label="Estación anterior">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
               </button>
-              <button id="btnPlay" class="btn-control play-btn" aria-label="Reproducir">
+              <button id="btnPlay" class="btn-control play-btn" aria-label="Reproducir o Pausar">
                 <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
               </button>
-              <button id="btnNext" class="sec-btn" aria-label="Siguiente">
+              <button id="btnNext" class="sec-btn" aria-label="Siguiente estación">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
               </button>
             </div>
@@ -148,31 +154,36 @@
           </div>
         </section>
 
+        <!-- FILTROS (Se mantienen aquí para acceso rápido a lista) -->
         <section class="filters glass-panel">
-          <div class="filters-header"><h3>Filtros</h3></div>
+          <div class="filters-header">
+            <h3>Filtros</h3>
+          </div>
           <div class="filter-row">
             <div class="form-group">
                 <label for="regionSelect" class="sr-only">Región</label>
-                <select id="regionSelect" class="input-dark"></select>
+                <select id="regionSelect" class="input-dark" aria-label="Filtrar por región"></select>
             </div>
             <div class="form-group">
                 <label for="countrySelect" class="sr-only">País</label>
-                <select id="countrySelect" class="input-dark"></select>
+                <select id="countrySelect" class="input-dark" aria-label="Filtrar por país"></select>
             </div>
           </div>
         </section>
       </aside>
 
+      <!-- SECCIÓN LISTA DE FRECUENCIAS -->
       <section class="stations-panel glass-panel">
         <div class="panel-head">
           <h3>Frecuencias</h3>
           <div class="header-actions">
             <button id="btnInstall" class="btn-text" style="display:none; color: #00e676;">Instalar App</button>
             <button id="clearFilters" class="btn-text">Reset</button>
-            <label for="stationSearch" class="sr-only">Buscar</label>
+            <label for="stationSearch" class="sr-only">Buscar emisora</label>
             <input id="stationSearch" type="search" placeholder="Buscar..." class="input-dark search-input">
           </div>
         </div>
+
         <div class="fav-toggle-wrap">
           <label class="switch-label" for="favoritesToggle">
             <input type="checkbox" id="favoritesToggle">
@@ -181,15 +192,20 @@
         </div>
         <div id="stationList" class="station-grid"></div>
       </section>
+
     </div>
   </main>
 
   <footer class="site-footer"><p>&copy; 2025 Radio Satelital</p></footer>
-  <script src="js/stations.js?v=7.8"></script>
-  <script src="js/main.js?v=7.8"></script>
+  <script src="js/stations.js?v=7.5"></script>
+  <script src="js/main.js?v=7.5"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('PWA Ready v7.5:', reg.scope))
+          .catch(err => console.error('PWA Error:', err));
+      });
     }
   </script>
 </body>
