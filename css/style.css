@@ -174,9 +174,11 @@ body[data-theme="amoled"] .ambient-bg { display: none; }
 .social-link { width: 48px; height: 48px; background: var(--input-bg); border: 1px solid var(--border-glass); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; }
 .social-link svg { width: 24px; height: 24px; }
 .social-link:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-.social-link.facebook:hover { background: #1877F2; border-color: #1877F2; }
-.social-link.instagram:hover { background: #E1306C; border-color: #E1306C; }
-.social-link.whatsapp:hover { background: #25D366; border-color: #25D366; }
+
+/* SOCIAL ICONS ORIGINAL COLORS (NUEVO) */
+.social-link.facebook-orig:hover { border-color: #1877F2; background: rgba(24, 119, 242, 0.1); }
+.social-link.instagram-orig:hover { border-color: #d62976; background: rgba(214, 41, 118, 0.1); }
+.social-link.whatsapp-orig:hover { border-color: #25D366; background: rgba(37, 211, 102, 0.1); }
 
 /* LISTA Y HEADERS */
 .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 10px; }
