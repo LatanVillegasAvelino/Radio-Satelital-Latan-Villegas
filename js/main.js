@@ -1,6 +1,6 @@
 // js/main.js
 // =======================
-// SYSTEM CONFIG v7.3 (PWA ENABLED - A11Y PATCHED)
+// SYSTEM CONFIG v7.4 (THEME BUTTONS + SCROLL NAV)
 // =======================
 
 // MAPA DE ASIGNACIÓN DE CLASES DE COLOR POR PAÍS
@@ -53,11 +53,9 @@ const els = {
   favToggle: document.getElementById("favoritesToggle"),
   clearFilters: document.getElementById("clearFilters"),
   addForm: document.getElementById("addStationForm"),
-
-  // NUEVOS ELEMENTOS DEL MENÚ
-  settingsBtn: document.getElementById("settingsTrigger"),
-  settingsMenu: document.getElementById("settingsMenu"),
-  themeBtns: document.querySelectorAll(".theme-btn")
+  // Nuevos elementos
+  btnOptions: document.getElementById("btnOptions"),
+  optionsSection: document.getElementById("optionsSection")
 };
 
 const init = () => {
@@ -77,16 +75,20 @@ const init = () => {
     favorites = new Set();
   }
 
+  // Cargar Tema Guardado y Marcar Botón Activo
   const savedTheme = localStorage.getItem("ultra_theme") || "default";
   setTheme(savedTheme);
-  updateActiveThemeBtn(savedTheme); // Marcar botón activo visualmente
+  
+  // Marcar visualmente el botón seleccionado
+  const activeBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
+  if(activeBtn) activeBtn.classList.add('active');
 
   loadFilters();
   resetControls();
   renderList();
   setupListeners();
   
-  console.log(`System Ready v7.3`);
+  console.log(`System Ready v7.4`);
 };
 
 const resetControls = () => {
@@ -96,25 +98,13 @@ const resetControls = () => {
   if(els.favToggle) els.favToggle.checked = false;
 };
 
-// Lógica Visual para los botones de tema
-const updateActiveThemeBtn = (themeName) => {
-    if(!els.themeBtns) return;
-    els.themeBtns.forEach(btn => {
-        if(btn.dataset.theme === themeName) {
-            btn.classList.add("active");
-        } else {
-            btn.classList.remove("active");
-        }
-    });
-};
-
 const setTheme = (themeName) => {
   document.body.setAttribute("data-theme", themeName === "default" ? "" : themeName);
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if(metaTheme) {
       switch(themeName) {
           case 'amoled': metaTheme.setAttribute("content", "#000000"); break;
-          case 'white': metaTheme.setAttribute("content", "#f8fafc"); break; 
+          case 'white': metaTheme.setAttribute("content", "#f2f4f7"); break; 
           case 'gold': metaTheme.setAttribute("content", "#12100b"); break;
           case 'purple': metaTheme.setAttribute("content", "#0a0011"); break;
           default: metaTheme.setAttribute("content", "#05070a");
@@ -252,6 +242,7 @@ const renderList = () => {
   filtered.forEach(st => {
     const isActive = currentStation && currentStation.name === st.name;
     const isFav = favorites.has(st.name);
+    
     const badgeClass = countryClassMap[st.country] || "badge-default"; 
     const animatingClass = (isActive && isPlaying) ? 'animating' : '';
 
@@ -337,7 +328,7 @@ const updateMediaSession = () => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentStation.name,
       artist: currentStation.country + ' · ' + currentStation.region,
-      album: 'Satelital Wave Player v7.3',
+      album: 'Satelital Wave Player v7.4',
     });
     navigator.mediaSession.setActionHandler('previoustrack', () => skipStation(-1));
     navigator.mediaSession.setActionHandler('nexttrack', () => skipStation(1));
@@ -365,32 +356,23 @@ const setupListeners = () => {
   if(els.btnPrev) els.btnPrev.addEventListener("click", () => skipStation(-1));
   if(els.btnNext) els.btnNext.addEventListener("click", () => skipStation(1));
   
-  // LOGICA DEL NUEVO MENÚ DE AJUSTES
-  if(els.settingsBtn && els.settingsMenu) {
-      els.settingsBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          els.settingsMenu.classList.toggle("hidden");
-      });
-      // Cerrar menú al hacer clic fuera
-      document.addEventListener("click", (e) => {
-          if(!els.settingsMenu.classList.contains("hidden") && 
-             !els.settingsMenu.contains(e.target) && 
-             !els.settingsBtn.contains(e.target)) {
-             els.settingsMenu.classList.add("hidden");
-          }
-      });
-  }
+  // LOGICA BOTONES DE TEMAS
+  const themeBtns = document.querySelectorAll('.theme-btn');
+  themeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      themeBtns.forEach(b => b.classList.remove('active')); // Quitar active
+      btn.classList.add('active'); // Poner active
+      const theme = btn.getAttribute('data-theme');
+      setTheme(theme);
+      localStorage.setItem("ultra_theme", theme);
+    });
+  });
 
-  // LOGICA DE LOS BOTONES DE TEMA
-  if(els.themeBtns) {
-      els.themeBtns.forEach(btn => {
-          btn.addEventListener("click", () => {
-              const theme = btn.dataset.theme;
-              setTheme(theme);
-              localStorage.setItem("ultra_theme", theme);
-              updateActiveThemeBtn(theme);
-          });
-      });
+  // LOGICA BOTÓN AJUSTES (SCROLL)
+  if(els.btnOptions && els.optionsSection) {
+    els.btnOptions.addEventListener('click', () => {
+        els.optionsSection.scrollIntoView({ behavior: 'smooth' });
+    });
   }
 
   if(els.search) els.search.addEventListener("input", renderList);
