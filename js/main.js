@@ -1,4 +1,4 @@
-// js/main.js v7.6 (FIXED MENU)
+// js/main.js v7.7 (NETWORK & TIMER FIX)
 // =======================
 
 const countryClassMap = {
@@ -16,13 +16,13 @@ let isPlaying = false;
 let timerInterval = null;
 let secondsElapsed = 0;
 
-// Objeto para elementos del DOM (se llenará al iniciar)
+// Objeto para elementos del DOM
 let els = {};
 
 const init = () => {
-  console.log("Iniciando Sistema v7.6...");
+  console.log("Iniciando Sistema v7.7...");
   
-  // 1. CAPTURAR ELEMENTOS AHORA (Asegura que existen)
+  // 1. CAPTURAR ELEMENTOS
   els = {
     player: document.getElementById("radioPlayer"),
     btnPlay: document.getElementById("btnPlay"),
@@ -65,7 +65,6 @@ const init = () => {
   const savedTheme = localStorage.getItem("ultra_theme") || "default";
   setTheme(savedTheme);
   
-  // Marcar botón activo en el menú (si existe)
   setTimeout(() => {
       const activeBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
       if(activeBtn) activeBtn.classList.add('active');
@@ -76,7 +75,7 @@ const init = () => {
   renderList();
   setupListeners();
   
-  console.log(`Sistema Listo v7.6`);
+  console.log(`Sistema Listo v7.7`);
 };
 
 const resetControls = () => {
@@ -100,11 +99,8 @@ const setTheme = (themeName) => {
   }
 };
 
-// --- LOGICA DEL MENÚ LATERAL ---
 const toggleMenu = (show) => {
-  console.log("Menú Toggle:", show); // Debug para ver si funciona
   if(!els.sideMenu || !els.menuOverlay) return;
-  
   if(show) {
     els.sideMenu.classList.add("open");
     els.menuOverlay.classList.add("open");
@@ -121,7 +117,10 @@ const playStation = (station) => {
   if(els.meta) els.meta.innerText = `${station.country} · ${station.region}`;
   if(els.status) { els.status.innerText = "BUFFERING..."; els.status.style.color = ""; }
   if(els.badge) els.badge.style.display = "none";
-  stopTimer(); if(els.timer) els.timer.innerText = "00:00";
+  
+  // Reseteamos timer visualmente, pero la lógica real iniciará en setPlayingState
+  if(els.timer) els.timer.innerText = "00:00";
+  stopTimer(); 
 
   try {
       els.player.src = station.url; els.player.volume = 1; 
@@ -144,10 +143,22 @@ const togglePlay = () => {
 const setPlayingState = (playing) => {
   isPlaying = playing;
   if(els.btnPlay) { if (playing) els.btnPlay.classList.add("playing"); else els.btnPlay.classList.remove("playing"); }
+  
   if (playing) {
     if(els.status) { els.status.innerText = "EN VIVO"; els.status.classList.add("live"); }
-    if(els.badge) els.badge.style.display = "inline-block";
-    startTimer();
+    
+    // Gestión del Badge LIVE / Conectando
+    if(els.badge) {
+        els.badge.style.display = "inline-block";
+        els.badge.innerText = navigator.onLine ? "LIVE" : "Conectando...";
+    }
+
+    // Iniciamos timer (reseteando a 0 si es nueva reproducción)
+    startTimer(true);
+
+    // Si al dar play no hay internet, pausamos el timer inmediatamente
+    if(!navigator.onLine && timerInterval) clearInterval(timerInterval);
+
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
   } else {
     if(els.status) { els.status.innerText = "PAUSADO"; els.status.classList.remove("live"); }
@@ -258,7 +269,7 @@ const updateMediaSession = () => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentStation.name,
       artist: currentStation.country + ' · ' + currentStation.region,
-      album: 'Satelital Wave Player v7.6',
+      album: 'Satelital Wave Player v7.7',
     });
     navigator.mediaSession.setActionHandler('previoustrack', () => skipStation(-1));
     navigator.mediaSession.setActionHandler('nexttrack', () => skipStation(1));
@@ -266,10 +277,18 @@ const updateMediaSession = () => {
     navigator.mediaSession.setActionHandler('pause', () => { els.player.pause(); setPlayingState(false); });
   }
 };
-const startTimer = () => {
-  stopTimer(); secondsElapsed = 0;
+
+// --- LOGICA DEL TIMER MEJORADA ---
+const startTimer = (reset = true) => {
+  // Aseguramos que no haya dos intervalos corriendo
+  if(timerInterval) clearInterval(timerInterval);
+  
+  if(reset) {
+    secondsElapsed = 0;
+    if(els.timer) els.timer.innerText = "00:00";
+  }
+
   if(els.timer) {
-    els.timer.innerText = "00:00";
     timerInterval = setInterval(() => {
       secondsElapsed++;
       const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
@@ -278,6 +297,7 @@ const startTimer = () => {
     }, 1000);
   }
 };
+
 const stopTimer = () => { if (timerInterval) clearInterval(timerInterval); };
 
 const setupListeners = () => {
@@ -297,16 +317,8 @@ const setupListeners = () => {
     });
   });
 
-  // LOGICA MENÚ (Listeners Blindados)
-  if(els.btnOptions) {
-    els.btnOptions.addEventListener("click", (e) => {
-      e.preventDefault();
-      toggleMenu(true);
-    });
-  } else {
-    console.error("Botón de opciones no encontrado");
-  }
-
+  // LOGICA MENÚ
+  if(els.btnOptions) els.btnOptions.addEventListener("click", (e) => { e.preventDefault(); toggleMenu(true); });
   if(els.btnCloseMenu) els.btnCloseMenu.addEventListener("click", () => toggleMenu(false));
   if(els.menuOverlay) els.menuOverlay.addEventListener("click", () => toggleMenu(false));
 
@@ -316,6 +328,25 @@ const setupListeners = () => {
   if(els.favToggle) els.favToggle.addEventListener("change", renderList);
   if(els.clearFilters) els.clearFilters.addEventListener("click", () => { resetControls(); renderList(); });
   if(els.addForm) els.addForm.addEventListener("submit", addCustomStation);
+
+  // --- LISTENERS DE CONEXIÓN ---
+  window.addEventListener('offline', () => {
+    if(isPlaying) {
+      if(els.badge) els.badge.innerText = "Conectando...";
+      // Pausar el timer sin resetearlo
+      if(timerInterval) clearInterval(timerInterval); 
+    }
+  });
+
+  window.addEventListener('online', () => {
+    if(isPlaying) {
+      if(els.badge) els.badge.innerText = "LIVE";
+      // Reanudar el timer (false = no resetear segundos)
+      startTimer(false); 
+      // Intentar reanudar audio si se detuvo
+      if(els.player) els.player.play(); 
+    }
+  });
 };
 
 // PWA INSTALL
