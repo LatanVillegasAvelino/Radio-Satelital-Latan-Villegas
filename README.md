@@ -23,6 +23,8 @@ Un reproductor de radio web moderno, personalizable y de alto rendimiento. Permi
 
 El proyecto está organizado de la siguiente manera para una fácil navegación y mantenimiento:
 
+
+
 / (Carpeta Raíz)
 ├── README.md # Este archivo.
 ├── index.html # Archivo principal que contiene la estructura de la aplicación.
