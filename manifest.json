@@ -1,13 +1,17 @@
 {
   "name": "Radio Satelital Ultra",
   "short_name": "Satelital",
-  "description": "Ultra Wave Player v7.5 - Interfaz de transmisión",
-  "start_url": "./index.html",
+  "description": "Escucha emisoras de radio en vivo de todo el mundo con Ultra Wave Player. Interfaz moderna, streaming de alta calidad y modo sin conexión.",
+  "id": "/index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#05070a",
   "theme_color": "#05070a",
   "orientation": "portrait",
   "scope": "/",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["music", "entertainment", "news"],
   "icons": [
     {
       "src": "icon-192.png",
@@ -33,5 +37,37 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Reproducir Radio",
+      "short_name": "Reproducir",
+      "description": "Inicia el reproductor de radio inmediatamente",
+      "url": "/index.html?action=play",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Pantalla Principal de Radio Satelital"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Reproductor Móvil"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }
