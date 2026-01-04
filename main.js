@@ -1,4 +1,4 @@
-// main.js v8.2 (FIX NOTIFICACIÓN PERSISTENTE)
+// main.js v8.0 (WEAR THEMES & NOTIFICATION FIX)
 // =======================
 
 const countryClassMap = {
@@ -20,7 +20,7 @@ let secondsElapsed = 0;
 let els = {};
 
 const init = () => {
-  console.log("Iniciando Sistema v8.2...");
+  console.log("Iniciando Sistema v8.0...");
   
   els = {
     player: document.getElementById("radioPlayer"),
@@ -66,7 +66,7 @@ const init = () => {
       if(activeBtn) activeBtn.classList.add('active');
   }, 100);
 
-  // Inicializar Handlers de Media Session UNA SOLA VEZ al inicio
+  // Inicializar Handlers de Notificación
   setupMediaSessionHandlers();
 
   loadFilters();
@@ -78,7 +78,7 @@ const init = () => {
     els.player.crossOrigin = "anonymous";
   }
 
-  console.log(`Sistema Listo v8.2`);
+  console.log(`Sistema Listo v8.0`);
 };
 
 const resetControls = () => {
@@ -90,13 +90,24 @@ const resetControls = () => {
 
 const setTheme = (themeName) => {
   document.body.setAttribute("data-theme", themeName === "default" ? "" : themeName);
+  
+  // Cambia el color de la barra del navegador según el tema
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if(metaTheme) {
       switch(themeName) {
+          // Temas Clásicos
           case 'amoled': metaTheme.setAttribute("content", "#000000"); break;
-          case 'white': metaTheme.setAttribute("content", "#f2f4f7"); break; 
+          case 'white': metaTheme.setAttribute("content", "#f8fafc"); break; 
           case 'gold': metaTheme.setAttribute("content", "#12100b"); break;
           case 'purple': metaTheme.setAttribute("content", "#0a0011"); break;
+          
+          // Nuevos Temas WEAR (Coincide con el fondo oscuro del tema)
+          case 'wear-ocean': metaTheme.setAttribute("content", "#0d1b2a"); break;
+          case 'wear-sunset': metaTheme.setAttribute("content", "#2d1b0e"); break;
+          case 'wear-galaxy': metaTheme.setAttribute("content", "#1a0b2e"); break;
+          case 'wear-mint': metaTheme.setAttribute("content", "#00241b"); break;
+          case 'wear-cherry': metaTheme.setAttribute("content", "#2b0505"); break;
+          
           default: metaTheme.setAttribute("content", "#05070a");
       }
   }
@@ -114,19 +125,17 @@ const toggleMenu = (show) => {
 };
 
 const playStation = (station) => {
-  // Si es la misma, pausamos/reproducimos
   if (currentStation && currentStation.name === station.name) { togglePlay(); return; }
   
   currentStation = station;
   
-  // 1. ACTUALIZAR UI VISUAL
+  // Actualizar UI
   if(els.title) els.title.innerText = station.name;
   if(els.meta) els.meta.innerText = `${station.country} · ${station.region}`;
   if(els.status) { els.status.innerText = "CONECTANDO..."; els.status.style.color = ""; }
   if(els.badge) els.badge.style.display = "none";
   
-  // 2. ACTUALIZAR NOTIFICACIÓN INMEDIATAMENTE (CRÍTICO PARA QUE NO DESAPAREZCA)
-  // Le decimos a Android "Hey, estoy tocando esto" antes de cargar el audio real.
+  // Actualizar Notificación ANTES de cargar audio (Para que no se cierre)
   updateMediaSessionMetadata();
   if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'playing';
@@ -203,31 +212,19 @@ const skipStation = (direction) => {
 
 // --- GESTIÓN DE NOTIFICACIONES ---
 
-// Configurar los botones UNA SOLA VEZ al inicio
 const setupMediaSessionHandlers = () => {
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.setActionHandler('play', () => { 
-      els.player.play(); 
-      setPlayingState(true); 
-    });
-    navigator.mediaSession.setActionHandler('pause', () => { 
-      els.player.pause(); 
-      setPlayingState(false); 
-    });
+    navigator.mediaSession.setActionHandler('play', () => { els.player.play(); setPlayingState(true); });
+    navigator.mediaSession.setActionHandler('pause', () => { els.player.pause(); setPlayingState(false); });
     navigator.mediaSession.setActionHandler('previoustrack', () => skipStation(-1));
     navigator.mediaSession.setActionHandler('nexttrack', () => skipStation(1));
-    
-    // Handler para "Stop" (algunos auriculares lo envían)
-    navigator.mediaSession.setActionHandler('stop', () => {
-       els.player.pause();
-       setPlayingState(false);
-    });
+    navigator.mediaSession.setActionHandler('stop', () => { els.player.pause(); setPlayingState(false); });
   }
 };
 
-// Actualizar solo TEXTO e IMAGEN al cambiar canción
 const updateMediaSessionMetadata = () => {
   if ('mediaSession' in navigator && currentStation) {
+    // Usamos TU LOGO (icon-192.png) para que Android saque los colores de ahí
     const artworkImage = [
       { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
       { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
@@ -236,11 +233,11 @@ const updateMediaSessionMetadata = () => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentStation.name,
       artist: currentStation.country,
-      album: 'Radio Satelital En Vivo',
+      album: 'Satelital Live',
       artwork: artworkImage
     });
 
-    // Eliminar la barra de tiempo (Fix para Live Radio)
+    // Fix para evitar barra de tiempo 00:00
     try { navigator.mediaSession.setPositionState(null); } catch(e) {}
   }
 };
@@ -351,6 +348,7 @@ const setupListeners = () => {
   if(els.btnPrev) els.btnPrev.addEventListener("click", () => skipStation(-1));
   if(els.btnNext) els.btnNext.addEventListener("click", () => skipStation(1));
   
+  // LOGICA PARA CAMBIAR TEMA (Detecta cualquier botón con clase theme-btn)
   const themeBtns = document.querySelectorAll('.theme-btn');
   themeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
