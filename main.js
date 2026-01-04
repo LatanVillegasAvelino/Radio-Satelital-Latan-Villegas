@@ -1,4 +1,4 @@
-// js/main.js v7.7 (NETWORK & TIMER FIX)
+// main.js v7.7 (NETWORK & TIMER FIX)
 // =======================
 
 const countryClassMap = {
