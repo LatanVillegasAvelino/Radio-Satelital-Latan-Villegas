@@ -1,6 +1,6 @@
-// stations.js
+// stations.js v8.5
 // =======================
-// DATA FRECUENCIAS v7.3 (Consolidado y Corregido)
+// DATA FRECUENCIAS v8.5 (Tu Lista Personalizada)
 // =======================
 
 const defaultStations = [
