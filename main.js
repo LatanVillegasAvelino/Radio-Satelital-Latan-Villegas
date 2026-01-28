@@ -1,5 +1,5 @@
-// main.js v8.5 (FULL PWA COMPLIANCE)
-// =======================
+// main.js v8.6 (FULL PWA COMPLIANCE + LIVE UI FIX)
+// =================================================
 
 const countryClassMap = {
   "España": "badge-spain", "Francia": "badge-france", "Alemania": "badge-germany", "EE.UU": "badge-usa", 
@@ -20,7 +20,7 @@ let secondsElapsed = 0;
 let els = {};
 
 const init = () => {
-  console.log("Iniciando Sistema v8.5...");
+  console.log("Iniciando Sistema v8.6...");
   
   els = {
     player: document.getElementById("radioPlayer"),
@@ -78,14 +78,12 @@ const init = () => {
     els.player.crossOrigin = "anonymous";
   }
 
-  // Solicitar permiso de Notificaciones (Requisito PWABuilder para "Re-engage users")
+  // Solicitar permiso de Notificaciones (Requisito PWABuilder)
   if ("Notification" in window && Notification.permission !== "granted") {
-    // Nota: Idealmente esto se pide tras una interacción del usuario (clic en botón)
-    // Lo dejamos aquí para que PWABuilder detecte la capacidad.
     // Notification.requestPermission(); 
   }
 
-  console.log(`Sistema Listo v8.5`);
+  console.log(`Sistema Listo v8.6`);
 };
 
 const resetControls = () => {
@@ -107,14 +105,12 @@ const setTheme = (themeName) => {
           case 'white': metaTheme.setAttribute("content", "#f8fafc"); break; 
           case 'gold': metaTheme.setAttribute("content", "#12100b"); break;
           case 'purple': metaTheme.setAttribute("content", "#0a0011"); break;
-          
-          // Nuevos Temas WEAR (Coincide con el fondo oscuro del tema)
+          // Temas WEAR
           case 'wear-ocean': metaTheme.setAttribute("content", "#0d1b2a"); break;
           case 'wear-sunset': metaTheme.setAttribute("content", "#2d1b0e"); break;
           case 'wear-galaxy': metaTheme.setAttribute("content", "#1a0b2e"); break;
           case 'wear-mint': metaTheme.setAttribute("content", "#00241b"); break;
           case 'wear-cherry': metaTheme.setAttribute("content", "#2b0505"); break;
-          
           default: metaTheme.setAttribute("content", "#05070a");
       }
   }
@@ -142,7 +138,7 @@ const playStation = (station) => {
   if(els.status) { els.status.innerText = "CONECTANDO..."; els.status.style.color = ""; }
   if(els.badge) els.badge.style.display = "none";
   
-  // Actualizar Notificación ANTES de cargar audio (Para que no se cierre)
+  // Actualizar Notificación ANTES de cargar audio
   updateMediaSessionMetadata();
   if ('mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'playing';
@@ -217,7 +213,7 @@ const skipStation = (direction) => {
   playStation(stations[newIndex]);
 };
 
-// --- GESTIÓN DE NOTIFICACIONES ---
+// --- GESTIÓN DE NOTIFICACIONES (FIXED) ---
 
 const setupMediaSessionHandlers = () => {
   if ('mediaSession' in navigator) {
@@ -231,10 +227,10 @@ const setupMediaSessionHandlers = () => {
 
 const updateMediaSessionMetadata = () => {
   if ('mediaSession' in navigator && currentStation) {
-    // Usamos TU LOGO (icon-192.png) para que Android saque los colores de ahí
+    // Usamos TU LOGO (icon-192.png)
     const artworkImage = [
-      { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-      { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
+      { src: 'assets/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: 'assets/icon-512.png', sizes: '512x512', type: 'image/png' }
     ];
 
     navigator.mediaSession.metadata = new MediaMetadata({
@@ -244,8 +240,17 @@ const updateMediaSessionMetadata = () => {
       artwork: artworkImage
     });
 
-    // Fix para evitar barra de tiempo 00:00
-    try { navigator.mediaSession.setPositionState(null); } catch(e) {}
+    // === TRUCO SENIOR APLICADO AQUÍ ===
+    // Esto activa el modo "EN VIVO" y quita el 00:00
+    try {
+        navigator.mediaSession.setPositionState({
+            duration: Infinity, 
+            playbackRate: 1,
+            position: 0
+        });
+    } catch(e) {
+        console.log("Live UI no soportada en este navegador");
+    }
   }
 };
 
@@ -355,7 +360,6 @@ const setupListeners = () => {
   if(els.btnPrev) els.btnPrev.addEventListener("click", () => skipStation(-1));
   if(els.btnNext) els.btnNext.addEventListener("click", () => skipStation(1));
   
-  // LOGICA PARA CAMBIAR TEMA (Detecta cualquier botón con clase theme-btn)
   const themeBtns = document.querySelectorAll('.theme-btn');
   themeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -394,7 +398,7 @@ const setupListeners = () => {
   });
 };
 
-// INSTALACIÓN PWA Y LOGICA "BTN INSTALL"
+// INSTALACIÓN PWA
 let deferredPrompt;
 const installBtn = document.getElementById('btnInstall');
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; if(installBtn) installBtn.style.display = 'block'; });
@@ -403,34 +407,24 @@ window.addEventListener('appinstalled', () => { if(installBtn) installBtn.style.
 
 document.addEventListener("DOMContentLoaded", init);
 
-// REGISTRO DE SERVICE WORKER Y CAPACIDADES AVANZADAS (v8.5)
+// REGISTRO DE SERVICE WORKER
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
       const reg = await navigator.serviceWorker.register('./sw.js');
-      console.log('PWA Service Worker v8.5 Registrado:', reg.scope);
+      console.log('PWA Service Worker v8.6 Registrado');
 
-      // 1. Sincronización Periódica (Requisito PWABuilder)
       if ('periodicSync' in reg) {
         try {
           const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
           if (status.state === 'granted') {
             await reg.periodicSync.register('update-content', { minInterval: 24 * 60 * 60 * 1000 });
-            console.log('Periodic Sync activado');
           }
-        } catch (e) { console.log('Periodic Sync no disponible'); }
+        } catch (e) {}
       }
-
-      // 2. Sincronización en Segundo Plano (Requisito PWABuilder)
       if ('sync' in reg) {
-        try {
-            await reg.sync.register('sync-stations');
-            console.log('Background Sync activado');
-        } catch (e) { console.log('Background Sync no disponible'); }
+        try { await reg.sync.register('sync-stations'); } catch (e) {}
       }
-
-    } catch (err) {
-      console.error('Error PWA:', err);
-    }
+    } catch (err) { console.error('Error PWA:', err); }
   });
 }
