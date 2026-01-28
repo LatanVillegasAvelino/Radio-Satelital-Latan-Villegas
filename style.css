@@ -1,4 +1,4 @@
-/* style.css v8.1 (SCROLL & COMPACT)
+/* style.css v8.2 (SOCIAL COLORS & SCROLL)
    ========================= */
 :root {
   /* DEFAULT (Cyber Dark) */
@@ -195,32 +195,42 @@ body[data-theme="amoled"] .ambient-bg { display: none; }
   transition: transform 0.2s;
   fill: var(--text-muted); 
 }
-.social-link:hover { 
-  transform: translateY(-3px); 
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
-  background: rgba(255, 255, 255, 0.05);
-}
-.social-link:hover svg { transform: scale(1.1); }
 
-/* Colores de marca */
+/* Colores de marca ORIGINALES (Siempre visibles) */
 .social-link.facebook-orig svg { fill: #1877F2; }
+.social-link.instagram-orig svg { fill: #E1306C; }
 .social-link.whatsapp-orig svg { fill: #25D366; }
 .social-link.spotify-orig svg { fill: #1DB954; }
 .social-link.youtube-orig svg { fill: #FF0000; }
 .social-link.pinterest-orig svg { fill: #E60023; }
-.social-link.wikipedia-orig svg { fill: #000000; }
-.social-link.applemusic-orig svg { fill: #FC3C44; }
+.social-link.wikipedia-orig svg { fill: #ffffff; background: #000; border-radius: 2px; } /* Wiki blanco sobre negro */
+.social-link.applemusic-orig svg { fill: #FA243C; }
 
-.social-link.facebook-orig:hover { border-color: #1877F2; }
-.social-link.instagram-orig:hover { border-color: #d62976; }
-.social-link.whatsapp-orig:hover { border-color: #25D366; }
-.social-link.spotify-orig:hover { border-color: #1DB954; }
-.social-link.youtube-orig:hover { border-color: #FF0000; }
-.social-link.pinterest-orig:hover { border-color: #E60023; }
-.social-link.wikipedia-orig:hover { border-color: #000000; }
-.social-link.applemusic-orig:hover { border-color: #FC3C44; }
+/* NUEVAS REDES SOCIALES */
+.social-link.x-orig svg { fill: #ffffff; } /* X es blanco en fondo oscuro */
+.social-link.tiktok-orig svg { fill: #FE2C55; } /* TikTok Rojo/Negro */
+.social-link.telegram-orig svg { fill: #229ED9; }
+.social-link.discord-orig svg { fill: #5865F2; }
+.social-link.linkedin-orig svg { fill: #0077B5; }
+.social-link.reddit-orig svg { fill: #FF4500; }
 
-body[data-theme="white"] .social-link.wikipedia-orig svg { background-color: #000; fill: #fff; border-radius: 2px; padding: 1px; }
+/* Efecto Hover (Brillo del color de la marca) */
+.social-link:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-3px); }
+
+.social-link.facebook-orig:hover { box-shadow: 0 5px 15px rgba(24, 119, 242, 0.4); border-color: #1877F2; }
+.social-link.instagram-orig:hover { box-shadow: 0 5px 15px rgba(225, 48, 108, 0.4); border-color: #E1306C; }
+.social-link.whatsapp-orig:hover { box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4); border-color: #25D366; }
+.social-link.spotify-orig:hover { box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4); border-color: #1DB954; }
+.social-link.youtube-orig:hover { box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4); border-color: #FF0000; }
+.social-link.pinterest-orig:hover { box-shadow: 0 5px 15px rgba(230, 0, 35, 0.4); border-color: #E60023; }
+.social-link.applemusic-orig:hover { box-shadow: 0 5px 15px rgba(250, 36, 60, 0.4); border-color: #FA243C; }
+.social-link.x-orig:hover { box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2); border-color: #fff; }
+.social-link.tiktok-orig:hover { box-shadow: 0 5px 15px rgba(254, 44, 85, 0.4); border-color: #FE2C55; }
+.social-link.telegram-orig:hover { box-shadow: 0 5px 15px rgba(34, 158, 217, 0.4); border-color: #229ED9; }
+.social-link.discord-orig:hover { box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4); border-color: #5865F2; }
+.social-link.linkedin-orig:hover { box-shadow: 0 5px 15px rgba(0, 119, 181, 0.4); border-color: #0077B5; }
+.social-link.reddit-orig:hover { box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4); border-color: #FF4500; }
+
 
 /* LAYOUT PANELES */
 .glass-panel { background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; position: relative; transition: background 0.3s; }
@@ -238,7 +248,7 @@ body[data-theme="white"] .social-link.wikipedia-orig svg { background-color: #00
 .search-input { max-width: 160px; min-height: 40px; }
 @media (max-width: 600px) { .panel-head { flex-direction: column; align-items: stretch; } .header-actions { justify-content: space-between; margin-top: 10px; } .search-input { max-width: 100%; flex: 1; } }
 
-/* === NUEVO: FILTROS COMPACTOS === */
+/* === FILTROS COMPACTOS (v8.1) === */
 .filters.glass-panel { padding: 1rem; margin-bottom: 1rem; }
 .filters-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
 .filters-header h3 { font-size: 0.9rem; opacity: 0.8; }
@@ -251,7 +261,7 @@ body[data-theme="white"] .social-link.wikipedia-orig svg { background-color: #00
 .filter-row .form-group { flex: 1; min-width: 120px; }
 .form-group { margin-bottom: 0; }
 
-/* === MODIFICADO: SCROLL INDEPENDIENTE === */
+/* === SCROLL INDEPENDIENTE (v8.1) === */
 .station-grid { 
   display: grid; 
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
