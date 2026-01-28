@@ -11,7 +11,25 @@
   "scope": "/",
   "lang": "es",
   "dir": "ltr",
-  "categories": ["music", "entertainment", "news"],
+  "categories": [
+    "music",
+    "entertainment",
+    "news"
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.latanvillegas.radio",
+      "id": "com.latanvillegas.radio"
+    }
+  ],
+  "scope_extensions": [
+    {
+      "origin": "https://latanvillegas.online"
+    }
+  ],
+  "handle_links": "preferred",
   "icons": [
     {
       "src": "icon-192.png",
@@ -44,7 +62,13 @@
       "short_name": "Reproducir",
       "description": "Inicia el reproductor de radio inmediatamente",
       "url": "/index.html?action=play",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "screenshots": [
@@ -77,8 +101,12 @@
     {
       "action": "/index.html",
       "accept": {
-        "audio/mpeg": [".mp3"],
-        "audio/x-mpegurl": [".m3u"]
+        "audio/mpeg": [
+          ".mp3"
+        ],
+        "audio/x-mpegurl": [
+          ".m3u"
+        ]
       }
     }
   ],
@@ -116,10 +144,13 @@
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "edge_side_panel": {
     "preferred_width": 400
   },
-  "related_applications": [],
   "prefer_related_applications": false
 }
