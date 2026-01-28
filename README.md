@@ -97,8 +97,5 @@ Desarrollado con ❤️ por **Latán Villegas Avelino**.
 
 [![Donar con PayPal](https://img.shields.io/badge/Hacer%20Donaci%C3%B3n-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=alv.oficial123@gmail.com&currency_code=USD&source=url)
 
-* **Cuenta:** `alv.oficial123@gmail.com`
-
-
 ---
 © 2026 Radio Satelital. Todos los derechos reservados.
