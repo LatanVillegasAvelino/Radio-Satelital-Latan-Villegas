@@ -82,6 +82,15 @@ Puedes contribuir de las siguientes formas:
 
 ---
 
+## 👤 Autor y Contacto
+
+Desarrollado con ❤️ por **Latán Villegas Avelino**.
+
+* **Redes:** Integradas en la aplicación (Menú Lateral).
+* **Estado:** Activo y en desarrollo constante.
+
+---
+
 ## ☕ Apoyo al Desarrollador
 
 ¿Te gusta **Radio Satelital**? Si valoras este proyecto y quieres motivar futuras actualizaciones, ¡invítame un café!
@@ -90,14 +99,6 @@ Puedes contribuir de las siguientes formas:
 
 * **Cuenta:** `alv.oficial123@gmail.com`
 
----
-
-## 👤 Autor y Contacto
-
-Desarrollado con ❤️ por **Latán Villegas Avelino**.
-
-* **Redes:** Integradas en la aplicación (Menú Lateral).
-* **Estado:** Activo y en desarrollo constante.
 
 ---
 © 2026 Radio Satelital. Todos los derechos reservados.
