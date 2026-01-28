@@ -1,65 +1,69 @@
-# Radio Satelital - Wave Player v7.5
+# 📻 Radio Satelital - Ultra Wave Player (v8.5)
 
-Un reproductor de radio web moderno, personalizable y de alto rendimiento. Permite a los usuarios escuchar emisoras de radio en vivo de todo el mundo, filtrar por país y región, y añadir sus propias frecuencias. La interfaz está diseñada para ser una Progressive Web App (PWA), lo que permite a los usuarios "instalarla" en sus dispositivos.
+![Version](https://img.shields.io/badge/version-v8.5-00e676?style=for-the-badge)
+![PWA](https://img.shields.io/badge/PWA-Certified-purple?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Android-TWA-3DDC84?style=for-the-badge&logo=android)
 
-## ✨ Características Principales
+**Radio Satelital** es una aplicación de radio progresiva (PWA) de última generación diseñada para ofrecer streaming de alta calidad, bajo consumo de datos y una experiencia visual inmersiva. Convertida a **Android TWA (Trusted Web Activity)** para una experiencia nativa completa.
 
--   **Reproductor de Audio Avanzado:** Controles de reproducción, pausa, anterior y siguiente, con un indicador de estado en tiempo real (`En Vivo`, `Cargando`, `Detenida`).
--   **Lista Dinámica de Emisoras:** Las estaciones se cargan desde un archivo `js/stations.js`, facilitando su gestión.
--   **Filtros y Búsqueda:** Filtra emisoras por país y región, y encuentra rápidamente tus estaciones favoritas con un buscador integrado.
--   **Sistema de Favoritos:** Marca y prioriza tus emisoras preferidas para un acceso rápido.
--   **Personalización de Temas:** Cambia la apariencia de la interfaz con múltiples temas predefinidos (Cyber Dark, AMOLED, Gold Luxury, etc.).
--   **Agregar Emisoras Personalizadas:** Un formulario en el menú permite a los usuarios guardar nuevas estaciones en el almacenamiento local de su navegador.
--   **Diseño Responsivo:** La interfaz se adapta fluidamente a dispositivos de escritorio, tabletas y móviles.
--   **Capacidad PWA (Progressive Web App):** Incluye un `manifest.json` y un `Service Worker` para que pueda ser "instalada" en el escritorio o la pantalla de inicio del móvil.
+🌐 **Web Oficial:** [latanvillegas.online](https://latanvillegas.online/)
 
-## 🚀 Tecnologías Utilizadas
+---
 
--   **HTML5:** Para la estructura semántica del sitio.
--   **CSS3:** Para el diseño, las animaciones y la personalización de temas a través de variables CSS.
--   **JavaScript (Vanilla JS):** Para toda la lógica del reproductor, la interactividad de la interfaz y la gestión de datos, sin necesidad de librerías o frameworks externos.
+## 🚀 Características Principales (v8.5)
 
-## 📁 Estructura de Archivos
+### 🎧 Experiencia de Audio Premium
+* **Audio en Segundo Plano (TWA):** La música sigue sonando con la pantalla apagada o mientras usas otras apps.
+* **Media Session API:** Controla la reproducción (Pausa/Siguiente/Anterior) desde la pantalla de bloqueo y barra de notificaciones.
+* **Soporte Multi-Formato:** Reproduce estaciones en vivo (Icecast/Shoutcast), archivos locales `.mp3` y listas `.m3u`.
 
-El proyecto está organizado de la siguiente manera para una fácil navegación y mantenimiento:
+### 📱 Capacidades PWA Avanzadas
+Esta aplicación cumple con los estándares más altos de **PWABuilder**:
+* **✅ Modo Offline:** Interfaz funcional sin conexión a internet.
+* **✅ Background Sync:** Sincronización de emisoras en segundo plano.
+* **✅ Periodic Sync:** Actualización automática de contenido.
+* **✅ Accesos Directos:** Inicia la radio manteniendo presionado el icono de la app (App Shortcuts).
+* **✅ Widgets:** Acceso rápido desde la pantalla de inicio.
+* **✅ File Handling:** Abre archivos de audio directamente con la app.
 
-/ (Carpeta Raíz)
-├── README.md
-├── index.html
-├── manifest.json
-├── sw.js
-├── css/
-│ └── style.css
-└── js/
-├── main.js
-└── stations.js
-## ⚙️ Instalación y Uso
+### 🎨 Personalización Visual
+Sistema de temas dinámicos con persistencia de preferencias:
+* **Clásicos:** Cyber Dark, White Mode, Gold Luxury, Neon Purple.
+* **Ahorro de Energía:** Modo AMOLED (Negro puro).
+* **Estilo Wear:** Temas con degradados vibrantes (Blue Ocean, Sunset Orange, Neon Galaxy).
 
-No se requiere una instalación compleja. Para ejecutar el proyecto localmente, sigue estos pasos:
+---
 
-1.  Clona o descarga este repositorio en tu computadora.
-2.  Navega a la carpeta del proyecto.
-3.  Abre el archivo `index.html` directamente en tu navegador web preferido (como Chrome, Firefox, etc.).
+## 📲 Descarga e Instalación
 
-¡Y eso es todo! El reproductor cargará las emisoras definidas en `js/stations.js` y estará listo para usar.
+### 🤖 Android (APK Oficial)
+Descarga la aplicación nativa sin publicidad y con todas las funciones desbloqueadas:
+[**📥 Descargar Última Versión (v8.5)**](https://github.com/LatanVillegasAvelino/Radio-Satelital-Latan-Villegas/releases)
 
-## 🎨 Personalización
+### 🌐 Web (PWA)
+1. Ingresa a [latanvillegas.online](https://latanvillegas.online/) desde Chrome o Edge.
+2. Presiona "Instalar Aplicación" en el menú del navegador.
 
-Puedes personalizar fácilmente varios aspectos del reproductor:
+---
 
--   **Cambiar el Logo:** El logo es un ícono SVG y se encuentra directamente en el `index.html`, dentro de la etiqueta `<header>`. Puedes reemplazar el código `<svg class="brand-logo" ...>` por tu propio SVG o por una etiqueta `<img>`.
+## 🛠️ Tecnologías Utilizadas
 
--   **Añadir Redes Sociales:** Los enlaces a las redes sociales están en la sección `<aside class="side-menu">` del `index.html`. Simplemente añade o modifica las etiquetas `<a>` correspondientes.
+* **Core:** HTML5, CSS3 (Variables & Glassmorphism), JavaScript (ES6+).
+* **PWA:** Service Workers, Manifest v3, Cache API.
+* **Build:** Bubblewrap (CLI) para empaquetado Android (TWA).
+* **Hosting:** GitHub Pages.
 
--   **Añadir Emisoras de Radio:** Para añadir más emisoras de forma permanente, edita el archivo `js/stations.js` y agrega un nuevo objeto al array `stations` con el siguiente formato:
-    ```javascript
-    {
-      name: "Nombre de la Radio",
-      country: "País",
-      url: "https://url-del-streaming.com"
-    }
-    ```
+---
 
-## ✒️ Autor
+## 📂 Estructura del Proyecto
 
--   **AVELINO LATAN VILLEGAS**
+```text
+/
+├── .well-known/      # Verificación de activos digitales (Asset Links)
+├── manifest.json     # Configuración PWA (Iconos, Display, Shortcuts)
+├── sw.js             # Service Worker (Lógica Offline y Sync)
+├── index.html        # Estructura principal
+├── style.css         # Estilos y Temas
+├── main.js           # Lógica del reproductor y UI
+├── stations.js       # Base de datos de emisoras
+└── assets/           # Iconos e imágenes
