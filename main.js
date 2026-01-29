@@ -1,5 +1,5 @@
-// main.js v8.7 (FINAL LIVE UI FIX)
-// =================================
+// main.js v8.7 (FINAL LIVE UI FIX + OPTIMIZED)
+// =============================================
 
 const countryClassMap = {
   "España": "badge-spain", "Francia": "badge-france", "Alemania": "badge-germany", "EE.UU": "badge-usa", 
@@ -122,7 +122,7 @@ const playStation = (station) => {
   if(els.timer) els.timer.innerText = "00:00";
   stopTimer(); 
 
-  // Configurar Metadata Básica (Titulo/Artista)
+  // Configurar Metadata Básica
   updateMediaSessionMetadata();
 
   try {
@@ -131,7 +131,7 @@ const playStation = (station) => {
       const p = els.player.play();
       if (p !== undefined) {
         p.then(() => { 
-          setPlayingState(true); // <--- AQUÍ SE APLICARÁ EL FIX
+          setPlayingState(true); 
         }).catch(e => {
           console.error("Error Reproducción:", e);
           if(els.status) { els.status.innerText = "ERROR"; els.status.style.color = "#ff3d3d"; }
@@ -166,9 +166,9 @@ const setPlayingState = (playing) => {
     if(!navigator.onLine && timerInterval) clearInterval(timerInterval);
     
     // === FIX DEFINITIVO NOTIFICACIÓN ===
+    // Se ejecuta AQUÍ, cuando el audio ya está confirmado
     if ('mediaSession' in navigator) {
         navigator.mediaSession.playbackState = 'playing';
-        // Forzamos "Infinity" AHORA que el audio ya arrancó
         try {
             navigator.mediaSession.setPositionState({
                 duration: Infinity, 
@@ -215,9 +215,10 @@ const setupMediaSessionHandlers = () => {
 
 const updateMediaSessionMetadata = () => {
   if ('mediaSession' in navigator && currentStation) {
+    // Usamos TU LOGO (icon-192.png)
     const artworkImage = [
-      { src: 'assets/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { src: 'assets/icon-512.png', sizes: '512x512', type: 'image/png' }
+      { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
     ];
     navigator.mediaSession.metadata = new MediaMetadata({
       title: currentStation.name,
