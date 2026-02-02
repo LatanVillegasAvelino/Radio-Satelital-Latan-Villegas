@@ -1,7 +1,7 @@
 {
-  "name": "Radio Satelital Ultra",
+  "name": "Radio Satelital",
   "short_name": "Satelital",
-  "description": "Escucha emisoras de radio en vivo de todo el mundo con Ultra Wave Player. Interfaz moderna, streaming de alta calidad y modo sin conexión.",
+  "description": "Escucha emisoras de radio en vivo. Desarrollado por Latán Villegas. Interfaz moderna, streaming de alta calidad y modo sin conexión.",
   "id": "/index.html",
   "start_url": "/index.html",
   "display": "standalone",
@@ -61,7 +61,7 @@
     {
       "name": "Reproducir Radio",
       "short_name": "Reproducir",
-      "description": "Inicia el reproductor de radio inmediatamente",
+      "description": "Inicia el reproductor inmediatamente",
       "url": "/index.html?action=play",
       "icons": [
         {
