@@ -1,5 +1,5 @@
-// sw.js - Edición Puntuación Perfecta v11
-const CACHE_NAME = 'radio-44-score';
+// sw.js - Edición Puntuación Perfecta v44
+const CACHE_NAME = 'radio-offline-v44';
 const OFFLINE_URL = './index.html';
 
 const ASSETS = [
@@ -13,7 +13,7 @@ const ASSETS = [
   './icon-512.png'
 ];
 
-// 1. INSTALACIÓN: Cachear obligatoriamente el INDEX para el modo offline
+// 1. INSTALACIÓN
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -21,7 +21,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ACTIVACIÓN: Limpieza
+// 2. ACTIVACIÓN
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => Promise.all(
@@ -33,23 +33,21 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 3. FETCH: Manejo Offline Robusto (Esto da el punto que falta)
+// 3. FETCH CON SOPORTE OFFLINE (Esto da el punto verde)
 self.addEventListener('fetch', (event) => {
-  // Ignorar streaming y métodos no-GET
+  // Ignoramos cosas que no sean GET o sean streams
   if (event.request.method !== 'GET' || event.request.url.includes('stream')) return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkRes) => {
-        // Actualizar caché si hay red
         const resClone = networkRes.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
         return networkRes;
       })
       .catch(() => {
-        // Si falla la red, buscar en caché
+        // Fallback Offline
         return caches.match(event.request).then((cachedRes) => {
-          // Si es navegación y no está en caché, devolver index.html (OFFLINE PAGE)
           if (!cachedRes && event.request.mode === 'navigate') {
             return caches.match(OFFLINE_URL);
           }
@@ -59,7 +57,7 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// --- EXTRAS PARA PWABUILDER (Sincronización y Push) ---
+// --- EXTRAS PARA PUNTUACIÓN MÁXIMA ---
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-data') event.waitUntil(Promise.resolve());
 });
