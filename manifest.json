@@ -10,6 +10,8 @@
   "orientation": "portrait",
   "scope": "/",
   "lang": "es",
+  "dir": "ltr",
+  "categories": ["music", "entertainment", "news"],
   "icons": [
     {
       "src": "icon-192.png",
@@ -79,6 +81,18 @@
   "scope_extensions": [
     { "origin": "https://latanvillegas.online" }
   ],
+  "file_handlers": [
+    {
+      "action": "/index.html",
+      "accept": {
+        "audio/mpeg": [".mp3"],
+        "audio/x-mpegurl": [".m3u"]
+      }
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "handle_links": "preferred",
   "prefer_related_applications": false,
   "serviceworker": {
