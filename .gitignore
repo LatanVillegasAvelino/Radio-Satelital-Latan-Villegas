@@ -1,0 +1,17 @@
+# Logs y Sistemas
+*.log
+.DS_Store
+Thumbs.db
+
+# Dependencias (si usas Node en el futuro)
+node_modules/
+package-lock.json
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.swp
+
+# Archivos de compilación temporal
+dist/
+build/
