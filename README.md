@@ -1,36 +1,33 @@
-# 📻 Radio Satelital - Ultra Wave Player (v8.5)
+# 📻 Radio Satelital - Ultra Wave Player (v9.5)
 
-![Version](https://img.shields.io/badge/version-v8.5-00e676?style=for-the-badge)
-![PWA](https://img.shields.io/badge/PWA-Certified-purple?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v9.5-00e676?style=for-the-badge)
+![PWA Score](https://img.shields.io/badge/PWABuilder-44%2F44-brightgreen?style=for-the-badge&logo=pwa)
 ![Platform](https://img.shields.io/badge/Android-TWA-3DDC84?style=for-the-badge&logo=android)
 
-**Radio Satelital** es una aplicación de radio progresiva (PWA) de última generación diseñada para ofrecer streaming de alta calidad, bajo consumo de datos y una experiencia visual inmersiva. Convertida a **Android TWA (Trusted Web Activity)** para una experiencia nativa completa.
+**Radio Satelital** es una aplicación de radio progresiva (PWA) de última generación, certificada con **puntuación perfecta (44/44)** en estándares web. Diseñada para ofrecer streaming de alta calidad, modo offline real y una experiencia visual inmersiva.
 
 🌐 **Web Oficial:** [latanvillegas.online](https://latanvillegas.online/)
 
 ---
 
-## 🚀 Características Principales (v8.5)
+## 🚀 Características Principales (v9.5)
+
+### 🏆 Certificación Platino PWA
+Esta versión ha alcanzado el máximo nivel de integración técnica:
+* **✅ Soporte Offline Real:** Nueva interfaz dedicada (`offline.html`) cuando no hay conexión.
+* **✅ Widgets Nativos:** Controla la radio desde la pantalla de inicio de Android (carpeta `widgets/`).
+* **✅ Integración Profunda:** Soporte para Pestañas (Tabbed Display) y Notas Rápidas.
+* **✅ Dual-App Ready:** Verificación de activos (`.well-known`) para coexistir con versiones anteriores.
 
 ### 🎧 Experiencia de Audio Premium
-* **Audio en Segundo Plano (TWA):** La música sigue sonando con la pantalla apagada o mientras usas otras apps.
-* **Media Session API:** Controla la reproducción (Pausa/Siguiente/Anterior) desde la pantalla de bloqueo y barra de notificaciones.
-* **Soporte Multi-Formato:** Reproduce estaciones en vivo (Icecast/Shoutcast), archivos locales `.mp3` y listas `.m3u`.
-
-### 📱 Capacidades PWA Avanzadas
-Esta aplicación cumple con los estándares más altos de **PWABuilder**:
-* **✅ Modo Offline:** Interfaz funcional sin conexión a internet.
-* **✅ Background Sync:** Sincronización de emisoras en segundo plano.
-* **✅ Periodic Sync:** Actualización automática de contenido.
-* **✅ Accesos Directos:** Inicia la radio manteniendo presionado el icono de la app (App Shortcuts).
-* **✅ Widgets:** Acceso rápido desde la pantalla de inicio.
-* **✅ File Handling:** Abre archivos de audio directamente con la app.
+* **Motor de Audio v9.5:** Optimizado para cero cortes en segundo plano.
+* **Media Session API:** Control total desde la pantalla de bloqueo y reloj.
+* **Multi-Formato:** Soporte nativo para `.mp3`, `.m3u` y streaming Shoutcast/Icecast.
 
 ### 🎨 Personalización Visual
-Sistema de temas dinámicos con persistencia de preferencias:
-* **Clásicos:** Cyber Dark, White Mode, Gold Luxury, Neon Purple.
-* **Ahorro de Energía:** Modo AMOLED (Negro puro).
-* **Estilo Wear:** Temas con degradados vibrantes (Blue Ocean, Sunset Orange, Neon Galaxy).
+* **Temas Premium:** Cyber Dark, AMOLED Real, Gold Luxury.
+* **Modo Wear:** Estilos inspirados en Smartwatches (Blue Ocean, Sunset Orange).
+* **Responsive:** Adaptación fluida a cualquier tamaño de pantalla.
 
 ---
 
@@ -38,7 +35,7 @@ Sistema de temas dinámicos con persistencia de preferencias:
 
 ### 🤖 Android (APK Oficial)
 Descarga la aplicación nativa sin publicidad y con todas las funciones desbloqueadas:
-[**📥 Descargar Última Versión (v8.5)**](https://github.com/LatanVillegasAvelino/Radio-Satelital-Latan-Villegas/releases)
+[**📥 Descargar Última Versión (v9.5)**](https://github.com/LatanVillegasAvelino/Radio-Satelital-Latan-Villegas/releases)
 
 ### 🌐 Web (PWA)
 1. Ingresa a [latanvillegas.online](https://latanvillegas.online/) desde Chrome o Edge.
@@ -46,25 +43,20 @@ Descarga la aplicación nativa sin publicidad y con todas las funciones desbloqu
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
-
-* **Core:** HTML5, CSS3 (Variables & Glassmorphism), JavaScript (ES6+).
-* **PWA:** Service Workers, Manifest v3, Cache API.
-* **Build:** Bubblewrap (CLI) para empaquetado Android (TWA).
-* **Hosting:** GitHub Pages.
-
----
-
 ## 📂 Estructura del Proyecto
 
 ```text
 /
-├── .well-known/      # Verificación de activos digitales (Asset Links)
-├── manifest.json     # Configuración PWA (Iconos, Display, Shortcuts)
-├── sw.js             # Service Worker (Lógica Offline y Sync)
-├── index.html        # Estructura principal
-├── style.css         # Estilos y Temas
-├── main.js           # Lógica del reproductor y UI
+├── .well-known/      # Verificación de activos (AssetLinks para TWA)
+├── widgets/          # Configuración de Widgets nativos
+│   ├── mini.json
+│   └── data.json
+├── manifest.json     # Manifiesto v3 (Pestañas, Notas, Shortcuts)
+├── sw.js             # Service Worker (Caché inteligente + Offline)
+├── index.html        # App Principal
+├── offline.html      # Pantalla Sin Conexión
+├── style.css         # Motor de Temas v9.5
+├── main.js           # Lógica del reproductor
 ├── stations.js       # Base de datos de emisoras
 └── assets/           # Iconos e imágenes
 
