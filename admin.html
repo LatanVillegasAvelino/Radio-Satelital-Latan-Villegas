@@ -66,6 +66,224 @@
       background: var(--brand);
     }
 
+    /* Notificaciones */
+    .notifications-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      transition: all 0.3s;
+      margin-left: 10px;
+    }
+
+    .notifications-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--accent);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #f44336;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 2px solid #05070a;
+    }
+
+    .notifications-btn:not(:has(.notification-badge)) .notification-badge {
+      display: none;
+    }
+
+    .notification-panel {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      width: 400px;
+      max-height: 500px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      z-index: 10000;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .notification-panel.open {
+      display: flex;
+    }
+
+    .notification-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .notification-panel-title {
+      font-weight: 700;
+      color: white;
+      margin: 0;
+    }
+
+    .notification-clear-btn {
+      padding: 4px 8px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.3s;
+    }
+
+    .notification-clear-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    .notification-item {
+      padding: 12px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      animation: slideIn 0.3s ease-out;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .notification-item:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .notification-item.read {
+      opacity: 0.6;
+    }
+
+    .notification-icon {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .notification-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .notification-text {
+      flex: 1;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      color: white;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .notification-message {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      margin: 4px 0 0 0;
+    }
+
+    .notification-time {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      margin-left: 10px;
+      white-space: nowrap;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0 5px;
+    }
+
+    .notification-close:hover {
+      color: white;
+    }
+
+    .notification-empty {
+      text-align: center;
+      padding: 30px 20px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .notification-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      background: rgba(76,175,80,0.2);
+      border: 1px solid rgba(76,175,80,0.5);
+      color: #4caf50;
+      border-radius: 8px;
+      animation: slideUp 0.3s ease-out;
+      z-index: 10001;
+      max-width: 350px;
+    }
+
+    .notification-toast.error {
+      background: rgba(244,67,54,0.2);
+      border-color: rgba(244,67,54,0.5);
+      color: #f44336;
+    }
+
+    .notification-toast.warning {
+      background: rgba(255,193,7,0.2);
+      border-color: rgba(255,193,7,0.5);
+      color: #ffc107;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .admin-tabs {
       display: flex;
       gap: 10px;
@@ -389,7 +607,20 @@
           <div id="adminEmail" style="font-weight: 600;">--</div>
           <div id="adminRole" class="admin-role-badge" style="margin-top: 8px;">--</div>
         </div>
+        <button id="btnNotifications" class="notifications-btn" title="Notificaciones" aria-label="Abrir notificaciones">
+          🔔
+          <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
+        </button>
         <button id="btnLogout" class="admin-logout-btn">Cerrar Sesión</button>
+      </div>
+
+      <!-- Panel de notificaciones -->
+      <div id="notificationPanel" class="notification-panel">
+        <div class="notification-panel-header">
+          <h3 class="notification-panel-title">Notificaciones</h3>
+          <button id="clearNotificationsBtn" class="notification-clear-btn">Limpiar</button>
+        </div>
+        <div id="notificationsList" class="notification-item-list"></div>
       </div>
     </div>
 
@@ -508,6 +739,7 @@
 
   <!-- Scripts -->
   <script src="supabase.config.js"></script>
+  <script src="realtime.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

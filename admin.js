@@ -13,6 +13,11 @@ let adminState = {
   admins: []
 };
 
+// Instancia de notificaciones en tiempo real
+let realtimeNotifier = null;
+let notifications = [];
+const MAX_NOTIFICATIONS = 50;
+
 // ===============================================================
 // CONFIGURACIÓN DE SUPABASE
 // ===============================================================
@@ -221,6 +226,188 @@ const loadApprovalHistory = async () => {
     console.error('Error cargando historial:', error);
     return [];
   }
+};
+
+// ===============================================================
+// FUNCIONES DE NOTIFICACIONES EN TIEMPO REAL
+// ===============================================================
+
+const addNotification = (notification) => {
+  notifications.unshift({
+    ...notification,
+    id: Date.now()
+  });
+
+  if (notifications.length > MAX_NOTIFICATIONS) {
+    notifications = notifications.slice(0, MAX_NOTIFICATIONS);
+  }
+
+  updateNotificationUI();
+  playNotificationSound();
+};
+
+const updateNotificationUI = () => {
+  const notificationsList = document.getElementById('notificationsList');
+  const notificationCount = document.getElementById('notificationCount');
+  const notificationsBtn = document.getElementById('btnNotifications');
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Actualizar badge
+  if (unreadCount > 0) {
+    notificationCount.textContent = unreadCount;
+    notificationCount.style.display = 'flex';
+    notificationsBtn.setAttribute('aria-label', `${unreadCount} notificaciones`);
+  } else {
+    notificationCount.style.display = 'none';
+  }
+
+  // Actualizar lista
+  if (notifications.length === 0) {
+    notificationsList.innerHTML = `
+      <div class="notification-empty">
+        <p>📭 Sin notificaciones</p>
+      </div>
+    `;
+  } else {
+    notificationsList.innerHTML = notifications.map(notif => `
+      <div class="notification-item ${notif.read ? 'read' : ''}" onclick="markNotificationAsRead(${notif.id})">
+        <div class="notification-content">
+          <span class="notification-icon">${getNotificationIcon(notif.type)}</span>
+          <div class="notification-text">
+            <p class="notification-title">${escapeHtml(notif.title)}</p>
+            <p class="notification-message">${escapeHtml(notif.message)}</p>
+          </div>
+          <span class="notification-time">${formatTimeAgo(notif.timestamp)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+};
+
+const getNotificationIcon = (type) => {
+  const icons = {
+    'station-added': '🎙️',
+    'station-approved': '✅',
+    'station-rejected': '❌',
+    'invitation-sent': '📧',
+    'admin-added': '👤',
+    'status-update': 'ℹ️'
+  };
+  return icons[type] || '🔔';
+};
+
+const markNotificationAsRead = (notificationId) => {
+  const notif = notifications.find(n => n.id === notificationId);
+  if (notif) {
+    notif.read = true;
+    updateNotificationUI();
+  }
+};
+
+const clearAllNotifications = () => {
+  notifications = [];
+  updateNotificationUI();
+};
+
+const formatTimeAgo = (timestamp) => {
+  const now = new Date();
+  const diffMs = now - new Date(timestamp);
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'Ahora';
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays < 7) return `${diffDays}d`;
+  
+  return new Date(timestamp).toLocaleDateString('es-ES');
+};
+
+const playNotificationSound = () => {
+  if (realtimeNotifier) {
+    realtimeNotifier.playNotificationSound();
+  }
+};
+
+const setupRealtimeListeners = () => {
+  if (!realtimeNotifier) {
+    const cfg = getSupabaseClient();
+    if (!cfg) return;
+    realtimeNotifier = new RealtimeNotifier(cfg);
+  }
+
+  // Escuchar nuevas radios pendientes
+  realtimeNotifier.watchPendingStations(async (station) => {
+    addNotification({
+      type: 'station-added',
+      title: '🎙️ Nueva radio pendiente',
+      message: `${station.name} (${station.country})`,
+      timestamp: new Date()
+    });
+
+    // Recargar lista de pendientes
+    await loadPendingStations();
+    renderStations();
+  });
+
+  // Escuchar cambios en aprobaciones
+  realtimeNotifier.watchApprovals(async (station) => {
+    if (station.status === 'approved') {
+      addNotification({
+        type: 'station-approved',
+        title: '✅ Radio aprobada',
+        message: `${station.name} fue aprobada por ${station.reviewed_by}`,
+        timestamp: new Date()
+      });
+    } else if (station.status === 'rejected') {
+      addNotification({
+        type: 'station-rejected',
+        title: '❌ Radio rechazada',
+        message: `${station.name} fue rechazada`,
+        timestamp: new Date()
+      });
+    }
+
+    // Recargar listas
+    await Promise.all([
+      loadPendingStations(),
+      loadApprovedStations(),
+      loadRejectedStations()
+    ]);
+    renderStations();
+  });
+
+  // Escuchar nuevas invitaciones
+  if (adminState.userRole === 'admin') {
+    realtimeNotifier.watchInvitations(async (invitation) => {
+      addNotification({
+        type: 'invitation-sent',
+        title: '📧 Invitación enviada',
+        message: `${invitation.email} fue invitado como ${invitation.role}`,
+        timestamp: new Date()
+      });
+
+      await loadInvitations();
+      renderInvitationsList();
+    });
+
+    // Escuchar nuevos administradores
+    realtimeNotifier.watchAdminUsers(async (admin) => {
+      addNotification({
+        type: 'admin-added',
+        title: '👤 Nuevo administrador',
+        message: `${admin.email} es ahora ${admin.role}`,
+        timestamp: new Date()
+      });
+
+      await loadAdmins();
+      renderAdminsList();
+    });
+  }
+
+  console.log('✓ Listeners de tiempo real configurados');
 };
 
 // ===============================================================
@@ -599,6 +786,25 @@ const setupEventListeners = () => {
   // Logout
   document.getElementById('btnLogout').addEventListener('click', logout);
 
+  // Panel de notificaciones
+  const notificationsBtn = document.getElementById('btnNotifications');
+  const notificationPanel = document.getElementById('notificationPanel');
+
+  notificationsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationPanel.classList.toggle('open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!notificationPanel.contains(e.target) && !notificationsBtn.contains(e.target)) {
+      notificationPanel.classList.remove('open');
+    }
+  });
+
+  document.getElementById('clearNotificationsBtn').addEventListener('click', () => {
+    clearAllNotifications();
+  });
+
   // Form de invitación
   document.getElementById('inviteForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -686,6 +892,18 @@ const init = async () => {
 
     renderStations();
     setupEventListeners();
+
+    // Configurar notificaciones en tiempo real
+    setupRealtimeListeners();
+
+    // Solicitar permiso para notificaciones del navegador
+    if (typeof RealtimeNotifier !== 'undefined' && realtimeNotifier) {
+      realtimeNotifier.requestNotificationPermission().then(granted => {
+        if (granted) {
+          console.log('✓ Notificaciones del navegador habilitadas');
+        }
+      });
+    }
 
     showMessage('✓ Panel de administración cargado', 'success');
   } catch (error) {
