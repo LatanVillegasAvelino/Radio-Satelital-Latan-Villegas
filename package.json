@@ -1,0 +1,14 @@
+{
+  "name": "radio-satelital-native",
+  "private": true,
+  "version": "9.5.0",
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.1"
+  }
+}

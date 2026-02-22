@@ -43,6 +43,92 @@ Descarga la aplicación nativa sin publicidad y con todas las funciones desbloqu
 
 ---
 
+## 🖥️ App Nativa de Escritorio (sin depender de Chrome)
+
+Este repositorio ahora incluye una versión de escritorio con **Tauri** en la carpeta `src-tauri/`.
+
+### ✅ Persistencia real de radios personalizadas
+- En modo nativo (Tauri), las radios agregadas desde la app se guardan en **SQLite** (no en caché del navegador).
+- Al actualizar la aplicación, las radios personalizadas **se mantienen**.
+- Campos soportados al agregar radio: **nombre, link, país, región, distrito y caserío**.
+
+### 🌍 Modo colaborativo global (Supabase)
+Con esta versión puedes habilitar que **todas las personas vean las radios que otros agregan**.
+
+1. Crea un proyecto en Supabase.
+2. En SQL Editor ejecuta: [docs/supabase_global_stations.sql](docs/supabase_global_stations.sql).
+3. Abre [supabase.config.js](supabase.config.js) y completa:
+	- `url`: URL de tu proyecto Supabase.
+	- `anonKey`: clave pública anon.
+	- `table`: `global_stations` (por defecto).
+4. Ejecuta la app (`npm run tauri:dev` o web) y agrega una radio desde el formulario.
+5. Las radios nuevas entran como **pending** (cola de revisión).
+6. Solo radios **approved** se muestran a todos en la app.
+
+> Si `supabase.config.js` queda vacío, la app sigue funcionando en modo local (SQLite/localStorage).
+
+### 🛡️ Moderación básica anti-spam
+La versión actual añade moderación en cliente + base de datos:
+
+- **Bloqueo de URL inválida** (solo `http/https`, sin `localhost` ni red privada).
+- **Validación de señal** antes de publicar global (prueba rápida del stream).
+- **Límite por minuto en cliente** (`limitPerMinute` en `supabase.config.js`).
+- **Límite por minuto en tabla global** (trigger SQL) + constraints de longitud/URL.
+
+### ✅ Moderación avanzada (cola de revisión)
+La tabla global ahora usa estados:
+- `pending`: enviada por usuario, aún no visible globalmente.
+- `approved`: visible para todos.
+- `rejected`: descartada.
+
+Para moderar, usa [docs/supabase_moderation_queries.sql](docs/supabase_moderation_queries.sql):
+- Listar pendientes
+- Aprobar por `id`
+- Rechazar por `id`
+
+Puedes ajustar en [supabase.config.js](supabase.config.js):
+- `limitPerMinute`
+- `streamCheckTimeoutMs`
+- `requireStreamValidation`
+
+### ⚡ DNS público / mayor velocidad
+El DNS no se puede “forzar” desde la app; se configura en tu infraestructura.
+
+Para máxima velocidad global:
+- Usa dominio propio de Supabase (CNAME) con Cloudflare.
+- Activa proxy/CDN y caché en rutas de lectura (`/rest/v1/global_stations?select=...`).
+- Si usas endpoint REST personalizado, define `restUrl` en [supabase.config.js](supabase.config.js).
+
+### Requisitos
+- Node.js 20+
+- Rust (toolchain estable)
+- Dependencias del sistema para Tauri en Linux (WebKitGTK, etc.)
+
+### Ejecutar en modo desarrollo
+```bash
+npm install
+npm run tauri:dev
+```
+
+### Generar instalador/binarios nativos
+```bash
+npm run tauri:build
+```
+
+Los paquetes compilados se generan dentro de `src-tauri/target/release/bundle/`.
+
+### Android (app nativa)
+Tauri v2 también permite empaquetar para Android:
+
+```bash
+npm run tauri android init
+npm run tauri android build
+```
+
+> Nota: para Android necesitas Android Studio + SDK/NDK configurados.
+
+---
+
 ## 📂 Estructura del Proyecto
 
 ```text
@@ -58,6 +144,7 @@ Descarga la aplicación nativa sin publicidad y con todas las funciones desbloqu
 ├── style.css         # Motor de Temas v9.5
 ├── main.js           # Lógica del reproductor
 ├── stations.js       # Base de datos de emisoras
+├── src-tauri/        # App nativa de escritorio (Tauri)
 └── assets/           # Iconos e imágenes
 
 ```
