@@ -31,5 +31,22 @@
       "../icon-192.png",
       "../icon-512.png"
     ]
+  },
+  "android": {
+    "usesPermission": [
+      "INTERNET",
+      "ACCESS_NETWORK_STATE",
+      "READ_MEDIA_AUDIO",
+      "READ_MEDIA_IMAGES"
+    ],
+    "usesCleartextTraffic": true,
+    "gradle": {
+      "minSdkVersion": 24,
+      "targetSdkVersion": 34,
+      "compileSdkVersion": 34
+    },
+    "buildFeatures": {
+      "buildConfig": true
+    }
   }
 }

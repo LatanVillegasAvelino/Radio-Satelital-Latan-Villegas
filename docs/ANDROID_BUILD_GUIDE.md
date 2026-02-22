@@ -1,122 +1,243 @@
-# Configuración de GitHub Actions para Android
+# Guía de Compilación de Android - Tauri v2
 
-Este documento explica cómo configurar y usar el flujo de trabajo de GitHub Actions para compilar APKs de Android automáticamente.
+Esta guía te ayudará a compilar Radio Satelital como aplicación nativa Android usando Tauri v2.
 
-## 📋 Requisitos previos
+## 🔍 Estado Actual de la Configuración
 
-Antes de que el flujo de trabajo funcione correctamente, necesitas:
+✅ **Configuración corregida:**
+- `src-tauri/tauri.conf.json`: Actualizado con configuración Android
+- `src-tauri/Cargo.toml`: Dependencias actualizadas
+- Iconos verificados: `icon-192.png` y `icon-512.png` existentes
+- Permisos Android configurados: INTERNET, ACCESO A RED, AUDIO Y MEDIOS
 
-### 1. Inicializar el proyecto Android localmente (primera vez)
+## 📋 Requisitos Previos
+
+### 1. Instalar herramientas requeridas
 
 ```bash
-cd src-tauri
-npm install -g @tauri-apps/cli@2.9.1
-tauri android init
+# Instalar Node.js y npm (si no los tienes)
+# Desde https://nodejs.org/
+
+# Instalar Rust (si no lo tienes)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Recargar variables de entorno
+source $HOME/.cargo/env
+```
+
+### 2. Instalar Android SDK
+
+```bash
+# Instalación recomendada: 
+# Descarga Android Studio desde https://developer.android.com/studio
+
+# O si prefieres CLI (Linux/macOS):
+# sdkmanager es proporcionado por Android Studio
+
+# Variables de entorno (agregar al ~/.bashrc o ~/.zshrc):
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+```
+
+### 3. Agregar targets de Rust para Android
+
+```bash
+rustup target add aarch64-linux-android
+rustup target add armv7-linux-androideabi
+rustup target add x86_64-linux-android
+rustup target add i686-linux-android
+```
+
+## 🚀 Inicialización de Android (Primera Vez)
+
+Ejecuta este script en el directorio raíz del proyecto:
+
+```bash
+bash scripts/setup-android.sh
+```
+
+O manualmente:
+
+```bash
+# 1. Instalar dependencias Node
+npm install
+
+# 2. Inicializar Android
+cargo install tauri-cli
+cargo tauri android init
 ```
 
 Esto creará la estructura de Android en `src-tauri/gen/android/`.
 
-### 2. Configurar la firma de la aplicación (Opcional pero recomendado)
+## 📦 Compilación para Android
 
-Para distribuir tu APK, necesitas firmarlo. Genera una keystore:
-
-```bash
-keytool -genkey -v -keystore radio-satelital.keystore -alias radio-satelital -keyalg RSA -keysize 2048 -validity 10000
-```
-
-Luego, convierte la keystore a base64:
+### Desarrollo en vivo
 
 ```bash
-cat radio-satelital.keystore | base64 > keystore.base64
+cargo tauri android dev
 ```
 
-### 3. Configurar secretos en GitHub
+Conecta un dispositivo Android o inicia un emulador, y la app se instalará en tiempo de desarrollo.
 
-Ve a tu repositorio en GitHub → Settings → Secrets and variables → Actions, y agrega los siguientes secretos:
-
-- `TAURI_SIGNING_PRIVATE_KEY`: Contenido del archivo `keystore.base64`
-- `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`: Contraseña que usaste al crear la keystore
-
-Si no quieres firmar la app aún, puedes omitir estos secretos (se generará un APK debug).
-
-### 4. Asegúrate de hacer commit de los archivos de Android
-
-Después de ejecutar `tauri android init`, debes hacer commit de:
+### Compilación de APK Debug
 
 ```bash
-git add src-tauri/gen/android/
-git add .github/workflows/build.yml
-git commit -m "Add Android configuration and GitHub Actions workflow"
-git push origin nativa
+cargo tauri android build --debug
 ```
 
-## 🚀 Uso
+APK generado: `src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk`
 
-El flujo de trabajo se ejecuta automáticamente cada vez que hagas push a la rama `nativa`:
+### Compilación de APK Release
 
 ```bash
-git add .
-git commit -m "Tu mensaje de commit"
-git push origin nativa
+# Compila APKs de diferentes arquitecturas
+cargo tauri android build --release
 ```
 
-## 📦 Obtener los APKs generados
+APKs generados en: `src-tauri/gen/android/app/build/outputs/apk/release/`
 
-1. Ve a tu repositorio en GitHub
-2. Click en la pestaña "Actions"
-3. Selecciona la ejecución del workflow más reciente
-4. Baja hasta "Artifacts" y descarga `android-apk`
-5. Descomprime el archivo ZIP para obtener tus APKs
+## 🔐 Firmar APK Release (Opcional)
 
-## 📱 Arquitecturas generadas
-
-El workflow genera APKs para las siguientes arquitecturas:
-
-- **universal**: APK que funciona en todos los dispositivos (más grande)
-- **arm64-v8a**: Dispositivos ARM de 64 bits (mayoría de dispositivos modernos)
-- **armeabi-v7a**: Dispositivos ARM de 32 bits (dispositivos más antiguos)
-- **x86**: Emuladores x86 de 32 bits
-- **x86_64**: Emuladores x86 de 64 bits
-
-Para distribución general, usa el APK **universal** o **arm64-v8a**.
-
-## 🏷️ Crear releases automáticos
-
-Si quieres crear un release automático en GitHub:
+### 1. Generar keystore
 
 ```bash
-git tag v9.5.0
-git push origin v9.5.0
+keytool -genkey -v \
+  -keystore $HOME/.android/radio-satelital.keystore \
+  -alias radio-satelital \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000
 ```
 
-Esto creará un release en GitHub con el APK universal adjunto.
+Responde las preguntas con tu información.
 
-## 🔧 Solución de problemas
+### 2. Configurar Tauri para usar la keystore
 
-### Error: "Android NDK not found"
-El workflow instala automáticamente el NDK, pero si tienes problemas localmente:
+Edita `src-tauri/tauri.conf.json`:
+
+```json
+"android": {
+  "signingConfig": {
+    "keystorePath": "/ruta/a/radio-satelital.keystore",
+    "keystorePassword": "tu_contraseña",
+    "keyAlias": "radio-satelital",
+    "keyPassword": "tu_contraseña"
+  }
+}
+```
+
+### 3. Compilar con firma
+
 ```bash
-sdkmanager --install "ndk;26.1.10909125"
-export ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/26.1.10909125
+cargo tauri android build --release
 ```
 
-### Error: "Rust target not found"
+## 📦 Estructuras Generadas
+
+Después de ejecutar `tauri android init`, se generan estos APKs:
+
+- **app-universal-release.apk**: Compatible con todos los dispositivos (recomendado para distribución)
+- **app-arm64-v8a-release.apk**: Dispositivos ARM 64-bit
+- **app-armeabi-v7a-release.apk**: Dispositivos ARM 32-bit
+- **app-x86-release.apk**: Emuladores x86
+- **app-x86_64-release.apk**: Emuladores x86 64-bit
+
+## 🧪 Testing Antes de Compilar
+
 ```bash
-rustup target add aarch64-linux-android armv7-linux-androideabi
+# Verificar que todo esté configurado correctamente
+ls -la src-tauri/gen/android/  # Debe existir
+
+# Ver la configuración
+cat src-tauri/tauri.conf.json | grep android
+
+# Limpiar builds anteriores
+cargo clean
+cd src-tauri && cargo clean
 ```
 
-### El build falla en GitHub Actions
-Revisa los logs en la pestaña "Actions" de GitHub para ver el error específico.
+## ⚠️ Problemas Comunes y Soluciones
 
-## 📝 Personalización
+### Error: "ANDROID_HOME no está definido"
+```bash
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+```
 
-Para cambiar la versión o configuración del APK, edita:
-- `src-tauri/tauri.conf.json`: Configuración general de Tauri
-- `src-tauri/Cargo.toml`: Versión del proyecto Rust
-- `package.json`: Versión del proyecto
+### Error: "Rust target aarch64-linux-android not found"
+```bash
+rustup target add aarch64-linux-android
+```
 
-## 🔗 Referencias útiles
+### APK no se instala en el dispositivo
+```bash
+# Verifica que el dispositivo está conectado
+adb devices
+
+# Instalar manualmente
+adb install -r app-universal-release.apk
+```
+
+### Service Worker causa conflictos
+El archivo `sw.js` (PWA) se deshabilita automáticamente en modo Tauri nativo. No requiere cambios.
+
+### Error de permisos en manifiesto
+Verificar que `tauri.conf.json` tiene:
+```json
+"android": {
+  "usesPermission": ["INTERNET", "ACCESS_NETWORK_STATE"]
+}
+```
+
+## 🔄 CI/CD con GitHub Actions
+
+Para compilar automáticamente en GitHub Actions, crea `.github/workflows/android-build.yml`:
+
+```yaml
+name: Android Build
+on:
+  push:
+    branches: [version-nativa]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v2
+      - name: Build APK
+        run: |
+          npm install
+          npm run tauri android build --release
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/release/
+```
+
+## 📱 Distribución
+
+### Google Play Store
+1. Crea una cuenta de desarrollador en https://play.google.com/console/developer/
+2. Sube el APK universal release
+3. Llena los requisitos de la tienda
+
+### Distribuir directamente
+1. Comparte el APK `app-universal-release.apk`
+2. Los usuarios pueden instalar con: `adb install -r app.apk`
+3. O hacer clic en el APK en el gestor de archivos del dispositivo
+
+## 🔗 Referencias
 
 - [Tauri Android Guide](https://v2.tauri.app/develop/android/)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Android Signing Guide](https://developer.android.com/studio/publish/app-signing)
+- [Android Developer Docs](https://developer.android.com/docs)
+- [Rust Android Targets](https://doc.rust-lang.org/platform-support.html#tier-2)
+- [Android Studio](https://developer.android.com/studio)
