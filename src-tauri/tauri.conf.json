@@ -4,10 +4,10 @@
   "version": "9.5.0",
   "identifier": "online.latanvillegas.radiosatelital",
   "build": {
-    "beforeDevCommand": "python3 -m http.server 1420 --directory ..",
+    "beforeDevCommand": "python3 -m http.server 1420 --directory ../public",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "",
-    "frontendDist": ".."
+    "frontendDist": "../public"
   },
   "app": {
     "windows": [
