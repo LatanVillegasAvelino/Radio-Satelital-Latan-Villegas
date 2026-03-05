@@ -113,6 +113,9 @@
         <form id="addStationForm" class="mini-form">
           <input type="text" id="newStationName" placeholder="Nombre" required class="input-dark mini">
           <input type="text" id="newStationCountry" placeholder="País" required class="input-dark mini">
+          <input type="text" id="newStationRegion" placeholder="Región / Estado" required class="input-dark mini">
+          <input type="text" id="newStationDistrict" placeholder="Distrito (opcional)" class="input-dark mini">
+          <input type="text" id="newStationCaserio" placeholder="Caserío (opcional)" class="input-dark mini">
           <input type="url" id="newStationUrl" placeholder="URL (HTTPS)" required class="input-dark mini">
           <button type="submit" class="btn-action">Guardar</button>
         </form>
@@ -193,6 +196,7 @@
   <footer class="site-footer"><p>© 2026 Latán Villegas Avelino · Radio Satelital</p></footer>
   
   <script src="stations.js?v=9.5"></script>
+  <script src="supabase.config.js?v=1"></script>
   <script src="main.js?v=9.5"></script>
   
   <script>

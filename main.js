@@ -18,7 +18,227 @@ let secondsElapsed = 0;
 
 let els = {};
 
-const init = () => {
+const GLOBAL_SUBMIT_LOG_KEY = "ultra_global_submit_log";
+
+const isPrivateHost = (host) => {
+  const value = (host || "").trim().toLowerCase();
+  if (!value) return true;
+  if (value === "localhost" || value.endsWith(".local")) return true;
+  if (value === "127.0.0.1" || value === "::1") return true;
+  if (/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(value)) return true;
+  return false;
+};
+
+const validateStationUrl = (urlValue) => {
+  try {
+    const parsed = new URL(urlValue);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return { valid: false, reason: "La URL debe usar http o https." };
+    }
+    if (!parsed.hostname || isPrivateHost(parsed.hostname)) {
+      return { valid: false, reason: "La URL debe ser pública (no localhost/red privada)." };
+    }
+    return { valid: true, url: parsed.toString() };
+  } catch (_) {
+    return { valid: false, reason: "La URL no es válida." };
+  }
+};
+
+const checkStreamReachable = (url, timeoutMs = 12000) => new Promise((resolve) => {
+  const audio = new Audio();
+  let settled = false;
+
+  const finish = (ok) => {
+    if (settled) return;
+    settled = true;
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+    resolve(ok);
+  };
+
+  const timer = setTimeout(() => finish(false), timeoutMs);
+  const success = () => {
+    clearTimeout(timer);
+    finish(true);
+  };
+  const fail = () => {
+    clearTimeout(timer);
+    finish(false);
+  };
+
+  audio.preload = "none";
+  audio.crossOrigin = "anonymous";
+  audio.addEventListener("canplay", success, { once: true });
+  audio.addEventListener("loadedmetadata", success, { once: true });
+  audio.addEventListener("playing", success, { once: true });
+  audio.addEventListener("error", fail, { once: true });
+  audio.src = url;
+  audio.load();
+});
+
+const canSubmitGlobalNow = (limitPerMinute) => {
+  const now = Date.now();
+  const oneMinuteAgo = now - 60_000;
+  const previous = JSON.parse(localStorage.getItem(GLOBAL_SUBMIT_LOG_KEY) || "[]");
+  const recent = previous.filter((t) => Number.isFinite(t) && t > oneMinuteAgo);
+
+  if (recent.length >= limitPerMinute) {
+    const waitMs = Math.max(0, 60_000 - (now - recent[0]));
+    return { allowed: false, waitSeconds: Math.ceil(waitMs / 1000) };
+  }
+
+  recent.push(now);
+  localStorage.setItem(GLOBAL_SUBMIT_LOG_KEY, JSON.stringify(recent));
+  return { allowed: true, waitSeconds: 0 };
+};
+
+const getSupabaseConfig = () => {
+  const cfg = window.SUPABASE_CONFIG || {};
+  if (!cfg.url || !cfg.anonKey) return null;
+  return {
+    url: String(cfg.url).replace(/\/$/, ""),
+    anonKey: String(cfg.anonKey),
+    table: cfg.table || "global_stations",
+    restUrl: cfg.restUrl || null,
+    limitPerMinute: Number.isFinite(cfg.limitPerMinute) ? Math.max(1, cfg.limitPerMinute) : 3,
+    streamCheckTimeoutMs: Number.isFinite(cfg.streamCheckTimeoutMs) ? Math.max(3000, cfg.streamCheckTimeoutMs) : 12000,
+    requireStreamValidation: cfg.requireStreamValidation !== false
+  };
+};
+
+const stationKey = (station) => `${String(station.name || "").trim().toLowerCase()}|${String(station.url || "").trim().toLowerCase()}`;
+
+const mergeStationSources = (localStations, globalStations) => {
+  const byKey = new Map();
+  [...defaultStations, ...(globalStations || []), ...(localStations || [])].forEach((station) => {
+    byKey.set(stationKey(station), station);
+  });
+  return [...byKey.values()];
+};
+
+const loadGlobalStations = async () => {
+  const cfg = getSupabaseConfig();
+  if (!cfg) return [];
+
+  const select = "name,url,country,region,district,caserio";
+  const baseRest = cfg.restUrl ? String(cfg.restUrl).replace(/\/$/, "") : `${cfg.url}/rest/v1`;
+  const endpoint = `${baseRest}/${cfg.table}?select=${encodeURIComponent(select)}&status=eq.approved&order=approved_at.desc.nullslast,created_at.desc`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "apikey": cfg.anonKey,
+        "Authorization": `Bearer ${cfg.anonKey}`
+      }
+    });
+
+    if (!response.ok) return [];
+    const rows = await response.json();
+    if (!Array.isArray(rows)) return [];
+
+    return rows.map((row) => ({
+      name: row.name,
+      url: row.url,
+      country: row.country,
+      region: row.region,
+      district: row.district || undefined,
+      caserio: row.caserio || undefined,
+      isCustom: true,
+      isGlobal: true
+    }));
+  } catch (_) {
+    return [];
+  }
+};
+
+const persistGlobalStation = async (station) => {
+  const cfg = getSupabaseConfig();
+  if (!cfg) return false;
+
+  const baseRest = cfg.restUrl ? String(cfg.restUrl).replace(/\/$/, "") : `${cfg.url}/rest/v1`;
+  const endpoint = `${baseRest}/${cfg.table}`;
+  const payload = {
+    name: station.name,
+    url: station.url,
+    country: station.country,
+    region: station.region,
+    district: station.district || null,
+    caserio: station.caserio || null,
+    status: "pending"
+  };
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": cfg.anonKey,
+      "Authorization": `Bearer ${cfg.anonKey}`,
+      "Prefer": "resolution=merge-duplicates,return=representation"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  return response.ok;
+};
+
+const tauriInvoke = () => {
+  try {
+    return window.__TAURI__?.core?.invoke || null;
+  } catch (_) {
+    return null;
+  }
+};
+
+const loadCustomStations = async () => {
+  const invoke = tauriInvoke();
+  if (invoke) {
+    try {
+      const items = await invoke("list_custom_stations");
+      return Array.isArray(items) ? items : [];
+    } catch (e) {
+      console.warn("No se pudo leer SQLite, usando almacenamiento local.", e);
+    }
+  }
+
+  return JSON.parse(localStorage.getItem("ultra_custom") || "[]");
+};
+
+const persistCustomStation = async (station) => {
+  const invoke = tauriInvoke();
+  if (invoke) {
+    await invoke("add_custom_station", {
+      station: {
+        name: station.name,
+        url: station.url,
+        country: station.country,
+        region: station.region,
+        district: station.district || null,
+        caserio: station.caserio || null
+      }
+    });
+    return;
+  }
+
+  const customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
+  customStations.push(station);
+  localStorage.setItem("ultra_custom", JSON.stringify(customStations));
+};
+
+const removeCustomStation = async (station) => {
+  const invoke = tauriInvoke();
+  if (invoke) {
+    await invoke("delete_custom_station", { name: station.name, url: station.url });
+    return;
+  }
+
+  let customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
+  customStations = customStations.filter(s => !(s.name === station.name && s.url === station.url));
+  localStorage.setItem("ultra_custom", JSON.stringify(customStations));
+};
+
+const init = async () => {
   console.log("Iniciando Sistema v9.5...");
   
   els = {
@@ -49,8 +269,11 @@ const init = () => {
   try {
     const savedFavs = JSON.parse(localStorage.getItem("ultra_favs") || "[]");
     favorites = new Set(savedFavs);
-    const customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
-    stations = [...customStations, ...defaultStations];
+    const [customStations, globalStations] = await Promise.all([
+      loadCustomStations(),
+      loadGlobalStations()
+    ]);
+    stations = mergeStationSources(customStations, globalStations);
   } catch (e) {
     localStorage.clear();
     stations = [...defaultStations];
@@ -168,7 +391,8 @@ const playStation = (station) => {
   currentStation = station;
   
   if(els.title) els.title.innerText = station.name;
-  if(els.meta) els.meta.innerText = `${station.country} · ${station.region}`;
+  const districtMeta = [station.district, station.caserio].filter(Boolean).join(" · ");
+  if(els.meta) els.meta.innerText = `${station.country} · ${station.region}${districtMeta ? ` · ${districtMeta}` : ""}`;
   if(els.status) { els.status.innerText = "CONECTANDO..."; els.status.style.color = ""; }
   if(els.badge) els.badge.style.display = "none";
   if(els.timer) els.timer.innerText = "00:00";
@@ -313,12 +537,13 @@ const renderList = () => {
     const animatingClass = (isActive && isPlaying) ? 'animating' : '';
     const div = document.createElement("div");
     div.className = `station-card ${isActive ? 'active' : ''} ${animatingClass}`;
-    const deleteBtn = st.isCustom ? `<button class="del-btn" title="Eliminar" aria-label="Eliminar emisora ${st.name}">×</button>` : '';
+    const deleteBtn = (st.isCustom && !st.isGlobal) ? `<button class="del-btn" title="Eliminar" aria-label="Eliminar emisora ${st.name}">×</button>` : '';
+    const subMeta = [st.region, st.district, st.caserio].filter(Boolean).join(" · ");
 
     div.innerHTML = `
       <div class="st-info">
         <div class="st-icon ${badgeClass}"></div>
-        <div><span class="st-name">${st.name}</span><span class="st-meta">${st.country}</span></div>
+        <div><span class="st-name">${st.name}</span><span class="st-meta">${st.country}${subMeta ? ` · ${subMeta}` : ''}</span></div>
       </div>
       <div style="display:flex; align-items:center; gap:10px;">
         ${deleteBtn}
@@ -332,32 +557,101 @@ const renderList = () => {
       localStorage.setItem("ultra_favs", JSON.stringify([...favorites]));
       renderList();
     };
-    if(st.isCustom) { div.querySelector('.del-btn').onclick = (e) => deleteCustomStation(e, st.name); }
+    if(st.isCustom && !st.isGlobal) { div.querySelector('.del-btn').onclick = (e) => deleteCustomStation(e, st); }
     fragment.appendChild(div);
   });
   els.list.appendChild(fragment);
 };
 
-const addCustomStation = (e) => {
+const addCustomStation = async (e) => {
   e.preventDefault();
   const name = document.getElementById("newStationName").value.trim();
   const country = document.getElementById("newStationCountry").value.trim();
-  const url = document.getElementById("newStationUrl").value.trim();
-  if(name && url) {
-    const newStation = { name, country, region: "Custom", url, isCustom: true };
-    const customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
-    customStations.push(newStation);
-    localStorage.setItem("ultra_custom", JSON.stringify(customStations));
-    location.reload(); 
+  const region = document.getElementById("newStationRegion").value.trim();
+  const district = document.getElementById("newStationDistrict").value.trim();
+  const caserio = document.getElementById("newStationCaserio").value.trim();
+  const rawUrl = document.getElementById("newStationUrl").value.trim();
+
+  const validUrl = validateStationUrl(rawUrl);
+  if (!validUrl.valid) {
+    alert(validUrl.reason);
+    return;
+  }
+  const url = validUrl.url;
+
+  if(name && url && country && region) {
+    const newStation = {
+      name,
+      country,
+      region,
+      district: district || undefined,
+      caserio: caserio || undefined,
+      url,
+      isCustom: true
+    };
+
+    try {
+      const cfg = getSupabaseConfig();
+      let globalSent = false;
+      if (cfg) {
+        const rate = canSubmitGlobalNow(cfg.limitPerMinute);
+        if (!rate.allowed) {
+          alert(`Has alcanzado el límite temporal. Intenta en ${rate.waitSeconds}s.`);
+          return;
+        }
+
+        if (cfg.requireStreamValidation) {
+          if(els.status) els.status.innerText = "Verificando señal...";
+          const reachable = await checkStreamReachable(url, cfg.streamCheckTimeoutMs);
+          if (!reachable) {
+            alert("La radio no responde o no parece un stream válido.");
+            if(els.status) els.status.innerText = "LISTO (CLICK PLAY)";
+            return;
+          }
+        }
+
+        globalSent = await persistGlobalStation(newStation);
+      }
+
+      await persistCustomStation(newStation);
+      const [customStations, globalStations] = await Promise.all([
+        loadCustomStations(),
+        loadGlobalStations()
+      ]);
+      stations = mergeStationSources(customStations, globalStations);
+      loadFilters();
+      renderList();
+      if(els.addForm) els.addForm.reset();
+      if(els.status) {
+        els.status.innerText = cfg
+          ? (globalSent ? "Enviada a revisión global" : "Guardada local (pendiente de envío)")
+          : "Radio agregada correctamente";
+      }
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo guardar la radio.");
+    }
   }
 };
-const deleteCustomStation = (e, stationName) => {
+const deleteCustomStation = async (e, station) => {
   e.stopPropagation();
-  if(confirm(`¿Eliminar ${stationName}?`)) {
-    let customStations = JSON.parse(localStorage.getItem("ultra_custom") || "[]");
-    customStations = customStations.filter(s => s.name !== stationName);
-    localStorage.setItem("ultra_custom", JSON.stringify(customStations));
-    location.reload();
+  if(confirm(`¿Eliminar ${station.name}?`)) {
+    try {
+      await removeCustomStation(station);
+      const [customStations, globalStations] = await Promise.all([
+        loadCustomStations(),
+        loadGlobalStations()
+      ]);
+      stations = mergeStationSources(customStations, globalStations);
+      if (currentStation && currentStation.isCustom && currentStation.name === station.name && currentStation.url === station.url) {
+        currentStation = null;
+      }
+      loadFilters();
+      renderList();
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo eliminar la radio.");
+    }
   }
 };
 const loadFilters = () => {

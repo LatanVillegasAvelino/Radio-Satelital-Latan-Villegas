@@ -1,0 +1,53 @@
+# GitHub Actions Workflow - Build Android APK (Debug)
+# 
+# Compilación de APK en modo debug sin requerimientos de firma.
+# Genera automáticamente una APK sin firmar lista para testing.
+
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - version-nativa
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Android APK (Debug)
+        uses: tauri-apps/tauri-action@v0
+        with:
+          projectPath: ./src-tauri
+          args: --debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-debug
+          path: src-tauri/target/aarch64-linux-android/debug/*.apk
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: List generated files
+        if: always()
+        run: |
+          echo "=== Build artifacts ==="
+          find src-tauri/target -name "*.apk" 2>/dev/null || echo "No APK files found"
