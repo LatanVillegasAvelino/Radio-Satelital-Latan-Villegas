@@ -30,12 +30,12 @@
     "icon": [
       "../icon-192.png",
       "../icon-512.png"
-    ]
-  },
-  "android": {
-    "minSdkVersion": 24,
-    "targetSdkVersion": 34,
-    "compileSdkVersion": 34
+    ],
+    "android": {
+      "minSdkVersion": 24,
+      "targetSdkVersion": 34,
+      "compileSdkVersion": 34
+    }
   },
   "plugins": {}
 }
