@@ -31,9 +31,7 @@
       "../icon-512.png"
     ],
     "android": {
-      "minSdkVersion": 24,
-      "targetSdkVersion": 34,
-      "compileSdkVersion": 34
+      "minSdkVersion": 24
     }
   }
 }
