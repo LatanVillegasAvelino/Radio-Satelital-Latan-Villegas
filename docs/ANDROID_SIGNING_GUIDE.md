@@ -1,6 +1,9 @@
 # Guía de Configuración de Firma Digital para APK Android
 
-Esta guía explica cómo configurar el firmado digital de tu aplicación Tauri para Android, necesario para distribuir aplicaciones en Google Play Store.
+> **Esquema de firma:** APK Signature Scheme V2 + V3 (RSA-2048, 10000 días de validez)  
+> **Secrets necesarios:** `KEYSTORE_BASE64` · `KEY_ALIAS` · `KEY_PASSWORD`
+
+Esta guía explica cómo generar el keystore de producción, codificarlo para GitHub Actions y verificar la firma V2/V3 antes de publicar en Google Play Console.
 
 ## 📋 Requisitos previos
 
@@ -84,27 +87,28 @@ base64 -i android-keystore.jks | tr -d '\n' | xclip -selection clipboard
 3. En el menú izquierdo: **Secrets and variables** → **Actions**
 4. Click en **New repository secret**
 
-### Secretos a configurar:
+### Secretos requeridos (3 en total):
 
-#### 1. ANDROID_KEYSTORE_BASE64 (REQUERIDO)
-- Valor: Contenido de `keystore.txt` (la salida base64)
-- Este es el archivo keystore encriptado
+| Secret | Descripción | Valor |
+|--------|-------------|-------|
+| `KEYSTORE_BASE64` | Keystore en Base64 (una línea, sin saltos) | Contenido de `keystore.txt` |
+| `KEY_ALIAS` | Alias de la clave dentro del keystore | Ej: `radio_satelital` |
+| `KEY_PASSWORD` | Contraseña del keystore y de la clave | La contraseña que usaste con `-storepass` |
 
-#### 2. KEYSTORE_PASSWORD (REQUERIDO)
-- Valor: La contraseña del store que definiste con `-storepass`
-- Ejemplo: `mi_super_contraseña_123`
+> **Nota de seguridad:** Usa la **misma contraseña** para `storepass` y `keypass` para simplificar  
+> la configuración en GitHub Actions (un solo secret `KEY_PASSWORD` cubre ambos).
+
+#### 1. KEYSTORE_BASE64 (REQUERIDO)
+- Valor: contenido completo del archivo `keystore.txt` generado en el paso 2
+- El workflow lo decodifica a un archivo temporal y lo elimina de forma segura con `shred`
+
+#### 2. KEY_ALIAS (REQUERIDO)
+- El alias usado al generar el keystore (`-alias` en el comando keytool)
+- Ejemplo: `radio_satelital`
 
 #### 3. KEY_PASSWORD (REQUERIDO)
-- Valor: La contraseña de la clave que definiste con `-keypass`
-- Ejemplo: `mi_otra_contraseña_456`
-
-#### 4. TAURI_PRIVATE_KEY (OPCIONAL)
-- Para actualizaciones automáticas con Tauri Updater
-- Contacta a soportedeauri.app para más información
-
-#### 5. TAURI_KEY_PASSWORD (OPCIONAL)
-- Contraseña para la clave privada de Tauri
-- Solo necesaria si usas TAURI_PRIVATE_KEY
+- Contraseña para acceder al keystore y a la clave
+- Ejemplo: `Mi_Contraseña_Segura_2024!`
 
 ## 📝 Paso 4: Verificar la Configuración en GitHub Actions
 
@@ -123,28 +127,38 @@ Una vez configurados los secretos, el workflow automáticamente:
 3. Selecciona el último workflow
 4. Observa los pasos en "Build Android APK"
 
-## ✅ Paso 5: Verificar la Firma Localmente
+## ✅ Paso 5: Verificar la Firma V2/V3 Localmente
 
-Después de descargar el APK desde GitHub Actions:
+El APK generado por el workflow usa **APK Signature Scheme V2 + V3** (V1 desactivado).  
+Usa `apksigner` (parte de Android SDK Build-Tools) para verificar correctamente:
 
-### Verificar la firma:
+### Verificar esquema V2/V3 con apksigner:
 
 ```bash
-jarsigner -verify -verbose -certs Radio_Satelital.apk
+# Ruta típica en Linux/macOS
+APKSIGNER=$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner
+
+$APKSIGNER verify --verbose --print-certs RadioSatelital-v9.5-release-signed.apk
 ```
 
 Salida esperada:
 ```
-s=SHA-256, ts=SHA-256, digsig (1.2.840.113549.1.7.2), tsdigsig (1.2.840.113549.1.7.2)
-sm=PKCSv7
-jar verified
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Number of signers: 1
+Signer #1 certificate DN: CN=..., OU=..., O=Radio Satelital, ...
+Signer #1 certificate SHA-256 digest: <fingerprint-sha256>
 ```
 
-### Ver detalles del certificado:
+### Ver fingerprint SHA-256 del certificado:
 
 ```bash
-keytool -printcert -jarfile Radio_Satelital.apk | head -20
+keytool -printcert -jarfile RadioSatelital-v9.5-release-signed.apk
 ```
+
+> **Nota:** `jarsigner -verify` solo valida V1 (JAR signing). Para V2/V3 usa **siempre** `apksigner verify`.
 
 ## 🚀 Compilar y Firmar Localmente
 

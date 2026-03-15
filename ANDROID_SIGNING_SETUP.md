@@ -1,4 +1,6 @@
-# 🔐 Configuración de Firma Digital - Quick Start
+# 🔐 Configuración de Firma Digital — Quick Start
+
+> Esquema de firma: **APK Signature Scheme V2 + V3** (RSA-2048 · 10000 días)
 
 ## 📦 Archivos creados/actualizados
 
@@ -29,13 +31,13 @@ Esto generará:
 
 Ve a: `https://github.com/latanvillegas/Radio_Satelital/settings/secrets/actions`
 
-Crea 3 secretos:
+Crea **3 secretos**:
 
 | Nombre | Valor |
 |--------|-------|
-| `ANDROID_KEYSTORE_BASE64` | Contenido de `android-keystore.txt` |
-| `KEYSTORE_PASSWORD` | La contraseña que usaste |
-| `KEY_PASSWORD` | La contraseña de la clave |
+| `KEYSTORE_BASE64` | Contenido de `android-keystore.txt` (una línea) |
+| `KEY_ALIAS` | El alias usado al generar (ej: `radio_satelital`) |
+| `KEY_PASSWORD` | La contraseña del keystore y clave |
 
 ### Paso 3: Activar el Workflow
 
@@ -52,20 +54,22 @@ El workflow se ejecutará automáticamente al detectar el push.
 
 ## 📱 Verificar el APK Firmado
 
-Después de que termine el workflow:
+Después del workflow:
 
 1. Ve a **Actions** en GitHub
 2. Selecciona la última ejecución
-3. Descarga el artifact `android-apk`
-4. Verifica localmente:
+3. Descarga el artifact `RadioSatelital-v9.5-Release-APK-Signed`
+4. Verifica la firma V2/V3 localmente:
 
 ```bash
-jarsigner -verify -verbose -certs Radio_Satelital.apk
+# Verificar esquema V2/V3 (usa apksigner, NO jarsigner)
+$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner verify --verbose --print-certs RadioSatelital-v9.5-release-signed.apk
 ```
 
 Salida esperada:
 ```
-jar verified
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
 ```
 
 ## ⚠️ Seguridad Importante

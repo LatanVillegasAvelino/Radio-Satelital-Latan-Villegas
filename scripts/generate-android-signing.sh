@@ -116,6 +116,26 @@ base64 -i "$KEYSTORE_FILE" | tr -d '\n' > "$BASE64_FILE"
 
 echo -e "${GREEN}✅ Keystore codificado a: $BASE64_FILE${NC}"
 
+# Verificación de firma con apksigner (si está disponible)
+echo ""
+echo "🔍 Verificación de firma con apksigner..."
+APKSIGNER_PATH=$(find "${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}" -name "apksigner" -type f 2>/dev/null | sort -V | tail -1)
+if [ -n "$APKSIGNER_PATH" ]; then
+    echo "   apksigner encontrado: $APKSIGNER_PATH"
+    echo "   Para verificar tu APK firmado ejecuta:"
+    echo ""
+    echo "   $APKSIGNER_PATH verify --verbose --print-certs <tu_apk.apk>"
+else
+    echo -e "${YELLOW}   ⚠️  apksigner no encontrado localmente (se usará en GitHub Actions).${NC}"
+fi
+echo ""
+echo "📋 Verificación con keytool (fingerprint del certificado):"
+keytool -list -v \
+    -keystore "$KEYSTORE_FILE" \
+    -storepass "$storepass" \
+    -alias "$ALIAS" \
+    2>/dev/null | grep -E "Owner|SHA256|SHA1|Alias|Valid"
+
 # Mostrar información de GitHub Secrets
 echo ""
 echo "🐙 GitHub Secrets a configurar"
@@ -123,16 +143,16 @@ echo "=================================="
 echo ""
 echo "1. Ve a: https://github.com/latanvillegas/Radio_Satelital/settings/secrets/actions"
 echo ""
-echo "2. Crea los siguientes secretos:"
+echo "2. Crea los 3 secretos siguientes:"
 echo ""
-echo "   📌 Secret 1: ANDROID_KEYSTORE_BASE64"
+echo "   📌 Secret 1: KEYSTORE_BASE64"
 echo "   Valor: (Contenido de $BASE64_FILE)"
 echo ""
-echo "   📌 Secret 2: KEYSTORE_PASSWORD"
-echo "   Valor: $storepass"
+echo "   📌 Secret 2: KEY_ALIAS"
+echo "   Valor: $ALIAS"
 echo ""
 echo "   📌 Secret 3: KEY_PASSWORD"
-echo "   Valor: $keypass"
+echo "   Valor: (tu contraseña del keystore/clave)"
 echo ""
 
 # Opción para copiar al portapapeles
@@ -177,9 +197,9 @@ Archivos generados:
 1. Configura los 3 secrets en GitHub:
    https://github.com/latanvillegas/Radio_Satelital/settings/secrets/actions
 
-   ANDROID_KEYSTORE_BASE64 = (contenido de $BASE64_FILE)
-   KEYSTORE_PASSWORD = "$storepass"
-   KEY_PASSWORD = "$keypass"
+   KEYSTORE_BASE64  = (contenido de $BASE64_FILE)
+   KEY_ALIAS        = "$ALIAS"
+   KEY_PASSWORD     = "$storepass"
 
 2. Haz un commit de los cambios en .gitignore:
    git add .gitignore
