@@ -38,6 +38,20 @@ self.addEventListener('fetch', (event) => {
   // Ignoramos streaming y métodos que no sean GET
   if (event.request.method !== 'GET' || event.request.url.includes('stream')) return;
 
+  // Rutas administrativas siempre por red para evitar ver versiones antiguas.
+  if (
+    event.request.url.includes('/admin') ||
+    event.request.url.includes('admin-') ||
+    event.request.url.includes('admin.js') ||
+    event.request.url.includes('admin-auth.js') ||
+    event.request.url.includes('admin-audit.js') ||
+    event.request.url.includes('rate-limiter.js') ||
+    event.request.url.includes('test-admin.js')
+  ) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((networkRes) => {
