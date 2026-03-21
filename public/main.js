@@ -213,6 +213,14 @@ const loadUiPrefs = () => {
       if (!Number.isFinite(value)) return 0;
       return Math.min(EQ_BAND_LIMIT, Math.max(-EQ_BAND_LIMIT, Math.round(value / 100) * 100));
     });
+    
+    // Validar playerMotion - forzar a rango válido [60, 180]
+    let playerMotionVal = AUDIO_PREF_DEFAULTS.playerMotion;
+    if (Number.isFinite(raw.playerMotion)) {
+      const rounded = Math.round(raw.playerMotion / 5) * 5;
+      playerMotionVal = Math.min(PLAYER_MOTION_MAX, Math.max(PLAYER_MOTION_MIN, rounded));
+    }
+    
     uiPrefs = {
       compactUi: raw.compactUi === true,
       decorativeMotion: raw.decorativeMotion !== false,
@@ -220,9 +228,7 @@ const loadUiPrefs = () => {
       autoRetry: raw.autoRetry !== false,
       retrySeconds: Number.isFinite(raw.retrySeconds) ? Math.min(8, Math.max(2, raw.retrySeconds)) : AUDIO_PREF_DEFAULTS.retrySeconds,
       menuFavOnly: raw.menuFavOnly === true,
-      playerMotion: Number.isFinite(raw.playerMotion)
-        ? Math.min(PLAYER_MOTION_MAX, Math.max(PLAYER_MOTION_MIN, Math.round(raw.playerMotion / 5) * 5))
-        : AUDIO_PREF_DEFAULTS.playerMotion,
+      playerMotion: playerMotionVal,
       playerMotionEnabled: raw.playerMotionEnabled !== false,
       listMotionEnabled: raw.listMotionEnabled !== false,
       eqEnabled: raw.eqEnabled !== false,
@@ -797,6 +803,13 @@ const init = async () => {
   if (typeof defaultStations === 'undefined') { console.error("Falta defaultStations."); return; }
   applyNativeAndroidMode();
   loadUiPrefs();
+  
+  // Validación de emergencia: si las prefs están muy corruptas, resetear todo
+  if (!Number.isFinite(uiPrefs.playerMotion) || uiPrefs.playerMotion < PLAYER_MOTION_MIN || uiPrefs.playerMotion > PLAYER_MOTION_MAX) {
+    uiPrefs.playerMotion = AUDIO_PREF_DEFAULTS.playerMotion;
+    persistUiPrefs();
+  }
+  
   applyUiPrefs();
   applyAudioPrefs();
   renderStationSkeletons();
@@ -1034,15 +1047,7 @@ const togglePlay = () => {
     return;
   }
 
-  if (isAndroidRuntime()) {
-    setPlayingState(false);
-    if (els.status) {
-      els.status.innerText = "Reproductor nativo no disponible";
-      els.status.style.color = "#ff5252";
-    }
-    return;
-  }
-
+  // Fallback a HTML5 player si no hay bridge nativo
   if (!els.player) return;
 
   if (els.player.paused) {
