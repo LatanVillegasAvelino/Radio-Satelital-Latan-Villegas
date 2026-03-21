@@ -1005,6 +1005,16 @@ const playStation = (station, autoplay = true) => {
     }
     return;
   }
+  
+  // IMPORTANTE: Parar reproducción anterior antes de cambiar
+  if (nativePlayerBridge.available()) {
+    nativePlayerBridge.pause();
+  } else if (els.player) {
+    els.player.pause();
+    els.player.src = ""; // Limpiar src anterior
+  }
+  stopTimer();
+  
   triggerSharedStationTransition(station);
   currentStation = station;
   saveLastStation(station);
@@ -1018,7 +1028,6 @@ const playStation = (station, autoplay = true) => {
   if(els.status) { els.status.innerText = "CONECTANDO..."; els.status.style.color = ""; }
   if(els.badge) els.badge.style.display = "none";
   if(els.timer) els.timer.innerText = "00:00";
-  stopTimer(); 
 
   updateMediaSessionMetadata();
 
@@ -1102,7 +1111,8 @@ const skipStation = (direction) => {
 const startPlaybackForCurrentStation = () => {
   if (!currentStation) return;
 
-  if (nativePlayerBridge.play(currentStation)) {
+  // Intenta con reproductor nativo primero
+  if (nativePlayerBridge.available() && nativePlayerBridge.play(currentStation)) {
     if(els.status) {
       els.status.innerText = "CONECTANDO...";
       els.status.style.color = "";
@@ -1110,33 +1120,51 @@ const startPlaybackForCurrentStation = () => {
     return;
   }
 
-  if (isAndroidRuntime()) {
-    setPlayingState(false);
-    if (els.status) {
-      els.status.innerText = "Reproductor nativo no disponible";
-      els.status.style.color = "#ff5252";
-    }
-    return;
-  }
-
+  // Fallback a reproductor HTML5
   if (!els.player) return;
 
   try {
     els.player.src = currentStation.url;
     els.player.volume = uiPrefs.audioVolume;
+    if(els.status) {
+      els.status.innerText = "CONECTANDO...";
+      els.status.style.color = "";
+    }
+    
     const p = els.player.play();
-    if (p !== undefined) {
+    
+    // Si play() devuelve Promise (navegadores modernos)
+    if (p !== undefined && typeof p.then === 'function') {
       p.then(() => {
-        setPlayingState(true);
+        // Solo actualizar si no se dispara el listener 'play'
+        if (!isPlaying) setPlayingState(true);
       }).catch(() => {
         setPlayingState(false);
         if(els.status) {
           els.status.innerText = "LISTO (CLICK PLAY)";
         }
       });
+    } else {
+      // Navigator antiguos: confiar en listener 'play'
+      // pero asegurarse con un timeout de fallback
+      const checkTimer = setTimeout(() => {
+        if (els.player && !els.player.paused && !isPlaying) {
+          setPlayingState(true);
+        }
+      }, 500);
+      
+      // Cancelar el check si play se dispara
+      const originalOnPlay = els.player.onplay;
+      els.player.onplay = () => {
+        if (originalOnPlay) originalOnPlay();
+        clearTimeout(checkTimer);
+      };
     }
   } catch (err) {
     console.error("Error Audio Critico", err);
+    if(els.status) {
+      els.status.innerText = "ERROR";
+    }
   }
 };
 
@@ -1338,17 +1366,25 @@ const loadFilters = () => {
 
 const startTimer = (reset = true) => {
   if(timerInterval) clearInterval(timerInterval);
-  if(reset) {
-    secondsElapsed = 0;
-    if(els.timer) els.timer.innerText = "00:00";
-  }
-  if(els.timer) {
-    timerInterval = setInterval(() => {
-      secondsElapsed++;
-      const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-      const s = (secondsElapsed % 60).toString().padStart(2, '0');
-      els.timer.innerText = `${m}:${s}`;
-    }, 1000);
+  
+  // Si es reproductor HTML5, dejar que timeupdate se encargue del timer
+  // Solo usar timer manual para reproductor nativo o si no hay player HTML5
+  if (nativePlayerBridge.available() || !els.player) {
+    if(reset) {
+      secondsElapsed = 0;
+      if(els.timer) els.timer.innerText = "00:00";
+    }
+    if(els.timer) {
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+        const s = (secondsElapsed % 60).toString().padStart(2, '0');
+        els.timer.innerText = `${m}:${s}`;
+      }, 1000);
+    }
+  } else {
+    // Para HTML5 player, solo resetear si es necesario
+    if(reset && els.timer) els.timer.innerText = "00:00";
   }
 };
 
@@ -1359,17 +1395,68 @@ const setupListeners = () => {
   if(els.btnPrev) els.btnPrev.addEventListener("click", () => skipStation(-1));
   if(els.btnNext) els.btnNext.addEventListener("click", () => skipStation(1));
   
+  // Listeners completos del reproductor HTML5
   if(els.player) {
+    // PLAY - Comienza reproducción
+    els.player.addEventListener('play', () => {
+      if (nativePlayerBridge.available()) return;
+      setPlayingState(true);
+    });
+
+    // PAUSE - Se pausa
+    els.player.addEventListener('pause', () => {
+      if (nativePlayerBridge.available()) return;
+      setPlayingState(false);
+    });
+
+    // TIMEUPDATE - Actualiza timer cada segundo
+    els.player.addEventListener('timeupdate', () => {
+      if (!els.timer || isNaN(els.player.duration)) return;
+      const mins = Math.floor(els.player.currentTime / 60);
+      const secs = Math.floor(els.player.currentTime % 60);
+      els.timer.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    });
+
+    // CANPLAY - Señal de que puede reproducir
+    els.player.addEventListener('canplay', () => {
+      if (nativePlayerBridge.available()) return;
+      if(els.status && els.status.innerText === "CONECTANDO...") {
+        els.status.innerText = "EN VIVO";
+        els.status.style.color = "";
+      }
+    });
+
+    // ERROR - Falla la emisora
     els.player.addEventListener('error', (e) => {
       if (nativePlayerBridge.available()) return;
-      console.warn("Emisora caída. Saltando...");
+      console.warn("Emisora caída", e);
       setPlayingState(false);
       
       if(els.status) {
-        els.status.innerText = "SIN SEÑAL / CAMBIANDO...";
+        els.status.innerText = "SIN SEÑAL";
         els.status.style.color = "#ff5252";
       }
       scheduleAutoRetry();
+    });
+
+    // SUSPEND - Pausa la descarga sin terminar
+    els.player.addEventListener('suspend', () => {
+      if (nativePlayerBridge.available()) return;
+      // Solo log, sin cambiar estado
+    });
+
+    // ABORT - Canceló descarga
+    els.player.addEventListener('abort', () => {
+      if (nativePlayerBridge.available()) return;
+      console.warn("Descarga abortada");
+      if(els.status) els.status.innerText = "DESCARGA CANCELADA";
+    });
+
+    // ENDED - Termina stream (en live radio normalmente no ocurre)
+    els.player.addEventListener('ended', () => {
+      if (nativePlayerBridge.available()) return;
+      console.log("Stream finalizado");
+      setPlayingState(false);
     });
   }
 
