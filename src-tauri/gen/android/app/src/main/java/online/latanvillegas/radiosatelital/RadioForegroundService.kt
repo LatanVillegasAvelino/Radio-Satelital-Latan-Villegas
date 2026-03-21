@@ -254,15 +254,6 @@ class RadioForegroundService : Service() {
           return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
         }
 
-        override fun onSeekToPrevious(session: MediaSession, controller: ControllerInfo): Int {
-          broadcastCommand(commandPrevious)
-          return SessionResult.RESULT_SUCCESS
-        }
-
-        override fun onSeekToNext(session: MediaSession, controller: ControllerInfo): Int {
-          broadcastCommand(commandNext)
-          return SessionResult.RESULT_SUCCESS
-        }
       })
       .build()
 
