@@ -80,6 +80,11 @@ const isAndroidRuntime = () => {
   }
 };
 
+const applyNativeAndroidMode = () => {
+  if (!isAndroidRuntime()) return;
+  document.body.classList.add("native-android");
+};
+
 const getNativeQueuePreview = (station) => {
   const fallback = { prevTitle: "", nextTitle: "" };
   if (!station || !Array.isArray(stations) || stations.length < 2) return fallback;
@@ -695,6 +700,7 @@ const init = async () => {
   };
 
   if (typeof defaultStations === 'undefined') { console.error("Falta defaultStations."); return; }
+  applyNativeAndroidMode();
   loadUiPrefs();
   applyUiPrefs();
   applyAudioPrefs();
@@ -1388,13 +1394,15 @@ const setupListeners = () => {
 
 let deferredPrompt;
 const installBtn = document.getElementById('btnInstall');
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; if(installBtn) installBtn.style.display = 'block'; });
-if(installBtn) { installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; deferredPrompt = null; installBtn.style.display = 'none'; } }); }
-window.addEventListener('appinstalled', () => { if(installBtn) installBtn.style.display = 'none'; console.log('PWA Installed'); });
+if (!isAndroidRuntime()) {
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; if(installBtn) installBtn.style.display = 'block'; });
+  if(installBtn) { installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; deferredPrompt = null; installBtn.style.display = 'none'; } }); }
+  window.addEventListener('appinstalled', () => { if(installBtn) installBtn.style.display = 'none'; console.log('PWA Installed'); });
+}
 
 document.addEventListener("DOMContentLoaded", init);
 
-if ('serviceWorker' in navigator) {
+if (!isAndroidRuntime() && 'serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
       const reg = await navigator.serviceWorker.register('./sw.js');
