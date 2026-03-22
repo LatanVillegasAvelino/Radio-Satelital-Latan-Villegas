@@ -93,6 +93,7 @@ class AppContainer(private val context: Context) {
     val radioViewModelFactory: RadioViewModelFactory by lazy {
         RadioViewModelFactory(
             observeStationsUseCase = observeStationsUseCase,
+            getFavoriteStationsUseCase = getFavoriteStationsUseCase,
             searchStationsUseCase = searchStationsUseCase,
             toggleFavoriteUseCase = toggleFavoriteUseCase
         )

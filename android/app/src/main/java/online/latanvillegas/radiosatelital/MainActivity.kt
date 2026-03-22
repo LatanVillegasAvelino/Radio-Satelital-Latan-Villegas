@@ -7,17 +7,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import dagger.hilt.android.AndroidEntryPoint
 import online.latanvillegas.radiosatelital.presentation.screens.RadioScreen
 import online.latanvillegas.radiosatelital.presentation.viewmodels.RadioViewModel
 
+/**
+ * Activity principal de la aplicación.
+ * Usa Hilt para inyectar automáticamente RadioViewModel mediante @HiltViewModel.
+ */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-  private val appContainer by lazy {
-    (application as RadioSatelitalApplication).appContainer
-  }
-
-  private val radioViewModel: RadioViewModel by viewModels {
-    appContainer.radioViewModelFactory
-  }
+  // Hilt inyecta automáticamente RadioViewModel - no requiere factory manual
+  private val radioViewModel: RadioViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
