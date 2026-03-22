@@ -6,8 +6,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.android.EntryPointAccessors
 import online.latanvillegas.radiosatelital.data.bootstrap.StationsAssetLoader
 import online.latanvillegas.radiosatelital.data.di.AppContainer
+import online.latanvillegas.radiosatelital.di.BootstrapEntryPoint
 import online.latanvillegas.radiosatelital.data.sync.SyncScheduler
 import online.latanvillegas.radiosatelital.observability.AppCrashReporter
 
@@ -20,6 +22,10 @@ class RadioSatelitalApplication : Application() {
         AppContainer(this)
     }
 
+    private val bootstrapEntryPoint: BootstrapEntryPoint by lazy {
+        EntryPointAccessors.fromApplication(this, BootstrapEntryPoint::class.java)
+    }
+
     override fun onCreate() {
         super.onCreate()
         crashReporter = AppCrashReporter(this).also { it.install() }
@@ -30,17 +36,17 @@ class RadioSatelitalApplication : Application() {
     private fun bootstrapDataSync() {
         applicationScope.launch {
             seedLocalStationsIfEmpty()
-            appContainer.syncStationsUseCase()
+            bootstrapEntryPoint.syncStationsUseCase()
         }
     }
 
     private suspend fun seedLocalStationsIfEmpty() {
-        val currentStations = appContainer.localStationDataSource.getSnapshot()
+        val currentStations = bootstrapEntryPoint.localStationDataSource().getSnapshot()
         if (currentStations.isNotEmpty()) {
             return
         }
         val stations = StationsAssetLoader.loadDefaultStations(this)
-        appContainer.seedDefaultStationsUseCase(stations)
+        bootstrapEntryPoint.seedDefaultStationsUseCase()(stations)
     }
 
     private fun scheduleBackgroundSync() {
