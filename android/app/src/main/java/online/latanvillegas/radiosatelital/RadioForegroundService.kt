@@ -18,6 +18,7 @@ import android.os.Looper
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -368,7 +369,8 @@ class RadioForegroundService : Service() {
         setPlayer(player)
       }
 
-    registerReceiver(
+    ContextCompat.registerReceiver(
+      this,
       object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
           when (intent?.action) {
@@ -380,7 +382,8 @@ class RadioForegroundService : Service() {
       IntentFilter().apply {
         addAction(customActionPrev)
         addAction(customActionNext)
-      }
+      },
+      ContextCompat.RECEIVER_NOT_EXPORTED
     )
   }
 
