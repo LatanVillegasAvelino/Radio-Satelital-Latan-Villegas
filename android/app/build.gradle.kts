@@ -41,6 +41,7 @@ android {
     val supabaseAnonKey = System.getenv("SUPABASE_ANON_KEY") ?: ""
 
     compileSdk = 36
+    buildToolsVersion = "36.0.0"
     namespace = "online.latanvillegas.radiosatelital"
     defaultConfig {
         manifestPlaceholders["usesCleartextTraffic"] = "false"

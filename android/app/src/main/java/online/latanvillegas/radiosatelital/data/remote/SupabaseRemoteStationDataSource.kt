@@ -91,7 +91,7 @@ class SupabaseRemoteStationDataSource(
             region = optString("region", ""),
             district = optString("district", ""),
             locality = optString("locality", ""),
-            imageUrl = optString("image_url", null),
+            imageUrl = optString("image_url", "").ifEmpty { null },
             isFavorite = optBoolean("is_favorite", false),
             isGlobal = optBoolean("is_global", true),
             status = optString("status", StationStatus.ACTIVE.name).toStationStatus()

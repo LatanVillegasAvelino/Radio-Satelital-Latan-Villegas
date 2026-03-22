@@ -31,7 +31,7 @@ object StationsAssetLoader {
                         region = item.optString("region", ""),
                         district = item.optString("district", ""),
                         locality = item.optString("locality", ""),
-                        imageUrl = item.optString("imageUrl", null),
+                        imageUrl = item.optString("imageUrl", "").ifEmpty { null },
                         isFavorite = item.optBoolean("isFavorite", false),
                         isGlobal = item.optBoolean("isGlobal", true),
                         status = item.optString("status", StationStatus.ACTIVE.name).toStationStatus()
