@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react'
 import type { Station } from '../types/station'
-import { getPublicRadios } from '../lib/stations'
+import { getMergedStations } from '../lib/stations'
 import { toggleFavorite as toggleFavoriteStorage, getFavorites } from '../lib/favorites'
 import { playStation as libPlay } from '../lib/player'
 
@@ -26,7 +26,7 @@ export default function useStations(){
       try {
         setLoading(true)
         setError(null)
-        const radios = await getPublicRadios()
+        const radios = await getMergedStations()
         
         if (radios.length === 0) {
           setError('No hay emisoras disponibles')
@@ -39,6 +39,7 @@ export default function useStations(){
             url: radio.streamUrl, // Compatibilidad con código existente
             streamUrl: radio.streamUrl,
             country: radio.country,
+            region: radio.region,
             logoUrl: radio.logoUrl,
             isFavorite: radio.isFavorite,
             tags: radio.tags,
@@ -47,7 +48,7 @@ export default function useStations(){
         }
       } catch (err) {
         console.error('Error cargando emisoras:', err)
-        setError('Error al cargar las emisoras de Firebase')
+        setError('Error al cargar las emisoras')
         setStations([])
       } finally {
         setLoading(false)
