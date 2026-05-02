@@ -27,6 +27,7 @@ export default function useStations(){
         setLoading(true)
         setError(null)
         const radios = await getMergedStations()
+        const favorites = getFavorites()
         
         if (radios.length === 0) {
           setError('No hay emisoras disponibles')
@@ -41,7 +42,7 @@ export default function useStations(){
             country: radio.country,
             region: radio.region,
             logoUrl: radio.logoUrl,
-            isFavorite: radio.isFavorite,
+            isFavorite: favorites.has(`${radio.name}|${radio.streamUrl}`),
             tags: radio.tags,
           } as Station))
           setStations(stations)
@@ -71,6 +72,7 @@ export default function useStations(){
     setCurrentStation(s)
     libPlay(s)
   }
+  const stationKey = (station: Station) => `${station.name}|${station.url || station.streamUrl}`
   const nextStation = () => {
     if (stations.length === 0) return
     const currentIndex = currentStation
@@ -86,8 +88,12 @@ export default function useStations(){
     playAtIndex(currentIndex >= 0 ? currentIndex - 1 : stations.length - 1)
   }
   const toggleFavorite = (s:Station)=>{
-    const key = `${s.name}|${s.url || s.streamUrl}`
+    const key = stationKey(s)
     toggleFavoriteStorage(key)
+    setStations(prev => prev.map(station => {
+      if (stationKey(station) !== key) return station
+      return { ...station, isFavorite: !station.isFavorite }
+    }))
   }
 
   const filtered = stations.filter(s=>{
@@ -115,6 +121,7 @@ export default function useStations(){
     stations: filtered,
     rawStations: stations,
     currentStation,
+    onlyFavs,
     playStation,
     nextStation,
     prevStation,

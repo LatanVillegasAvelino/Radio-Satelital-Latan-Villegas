@@ -4,18 +4,31 @@ import Player from '../components/Player'
 import StationGrid from '../components/StationGrid'
 import SideMenu from '../components/SideMenu'
 import Filters from '../components/Filters'
+import BottomNav from '../components/BottomNav'
 import useStations from '../hooks/useStations'
+import { Heart, Menu, Search, Settings } from 'lucide-react'
 
 export default function Page() {
-  const { stations, currentStation, playStation, nextStation, prevStation, toggleFavorite, setQuery, filters, toggleOnlyFavs, loading, error } = useStations()
+  const { stations, currentStation, playStation, nextStation, prevStation, toggleFavorite, setQuery, filters, toggleOnlyFavs, onlyFavs, loading, error } = useStations()
   const [menuOpen, setMenuOpen] = useState(false)
 
   const toggleMenu = () => setMenuOpen(open => !open)
-  const resetFilters = () => {
+  const openMenu = () => setMenuOpen(true)
+  const focusSearch = () => {
+    document.getElementById('filters-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.setTimeout(() => document.getElementById('station-search')?.focus(), 150)
+  }
+  const toggleFavorites = () => toggleOnlyFavs(!onlyFavs)
+  const focusCountry = () => {
+    document.getElementById('filters-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.setTimeout(() => document.getElementById('country-filter')?.focus(), 150)
+  }
+  const showAllStations = () => {
     setQuery('')
     filters.setCountry('')
     filters.setRegion('')
     toggleOnlyFavs(false)
+    document.getElementById('station-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
@@ -28,11 +41,20 @@ export default function Page() {
               <p className="site-subtitle">WAVE PLAYER V9.5</p>
             </div>
           </div>
-          <button id="btnOptions" className="sec-btn" onClick={toggleMenu} aria-label="Abrir menú">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
-              <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
+          <div className="header-actions header-icon-actions">
+            <button className="sec-btn header-icon-btn" onClick={toggleMenu} aria-label="Menú">
+              <Menu size={20} strokeWidth={2.2} />
+            </button>
+            <button className="sec-btn header-icon-btn" onClick={focusSearch} aria-label="Búsqueda">
+              <Search size={20} strokeWidth={2.2} />
+            </button>
+            <button className={`sec-btn header-icon-btn ${onlyFavs ? 'active' : ''}`} onClick={toggleFavorites} aria-label="Favoritos" aria-pressed={onlyFavs}>
+              <Heart size={20} strokeWidth={2.2} fill={onlyFavs ? '#6200EE' : 'none'} />
+            </button>
+            <button className="sec-btn header-icon-btn" onClick={openMenu} aria-label="Configuración">
+              <Settings size={20} strokeWidth={2.2} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -75,10 +97,11 @@ export default function Page() {
             </div>
           )}
           {!loading && !error && (
-            <StationGrid stations={stations} playStation={playStation} toggleFavorite={toggleFavorite} onResetFilters={resetFilters} />
+            <StationGrid stations={stations} playStation={playStation} toggleFavorite={toggleFavorite} onResetFilters={showAllStations} />
           )}
         </main>
       </div>
+      <BottomNav onMusic={() => document.getElementById('player-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} onFavorites={toggleFavorites} onCountry={focusCountry} onMyRadios={showAllStations} favoritesActive={onlyFavs} />
       <SideMenu open={menuOpen} onClose={()=>setMenuOpen(false)} />
     </div>
   )

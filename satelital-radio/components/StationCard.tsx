@@ -1,6 +1,7 @@
 "use client"
 import React from 'react'
 import { Station } from '../types/station'
+import { Heart, Play, Radio } from 'lucide-react'
 
 const countryClassMap: Record<string, string> = {
   'perú': 'badge-peru',
@@ -33,10 +34,10 @@ export default function StationCard({ station, onPlay, onToggleFav }: Props){
   const badgeClass = countryClassMap[(station.country || '').toLowerCase()] || 'badge-default'
 
   return (
-    <div className="station-card">
+    <div className="station-card rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
       <div className="st-info">
-        <div className={`st-icon ${badgeClass}`}>
-          <div className={`flag-badge ${badgeClass}`} />
+        <div className={`st-icon ${badgeClass}`} aria-hidden="true">
+          <Radio size={22} strokeWidth={2.2} color="#6200EE" />
         </div>
         <div>
           <span className="st-name">{station.name}</span>
@@ -44,8 +45,17 @@ export default function StationCard({ station, onPlay, onToggleFav }: Props){
         </div>
       </div>
       <div style={{display:'flex',alignItems:'center',gap:8}}>
-        <button className="sec-btn" onClick={()=>onPlay?.(station)} aria-label="Reproducir">▶</button>
-        <button className="fav-btn" onClick={()=>onToggleFav?.(station)} aria-label="Favorito">★</button>
+        <button className="sec-btn" onClick={()=>onPlay?.(station)} aria-label="Reproducir">
+          <Play size={18} strokeWidth={2.4} />
+        </button>
+        <button className="fav-btn" onClick={()=>onToggleFav?.(station)} aria-label="Favorito">
+          <Heart
+            size={18}
+            strokeWidth={2.2}
+            color={station.isFavorite ? '#6200EE' : '#9aa7b7'}
+            fill={station.isFavorite ? '#6200EE' : 'none'}
+          />
+        </button>
       </div>
     </div>
   )

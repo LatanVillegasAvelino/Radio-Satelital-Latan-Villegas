@@ -12,7 +12,7 @@ type Props = {
 
 export default function StationGrid({ stations, playStation, toggleFavorite, onResetFilters }: Props){
   return (
-    <div className="glass-panel">
+    <div className="glass-panel rounded-xl shadow-sm hover:shadow-md transition-all duration-200" id="station-list">
       <div className="panel-head station-panel-head">
         <h3>Frecuencias</h3>
         <div className="header-actions">
