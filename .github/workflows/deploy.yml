@@ -1,0 +1,32 @@
+name: Deploy Next.js to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: cd satelital-radio && npm install
+
+      - name: Build
+        run: cd satelital-radio && npm run build
+
+      - name: Export static files
+        run: cd satelital-radio && npm run export || npx next export
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./satelital-radio/out
+          cname: latanvillegas.online
