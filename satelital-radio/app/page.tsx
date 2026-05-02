@@ -7,7 +7,7 @@ import Filters from '../components/Filters'
 import useStations from '../hooks/useStations'
 
 export default function Page() {
-  const { stations, currentStation, playStation, toggleFavorite, setQuery, filters, toggleOnlyFavs, loading, error } = useStations()
+  const { stations, currentStation, playStation, nextStation, prevStation, toggleFavorite, setQuery, filters, toggleOnlyFavs, loading, error } = useStations()
   const [menuOpen, setMenuOpen] = useState(false)
 
   const toggleMenu = () => setMenuOpen(open => !open)
@@ -38,7 +38,7 @@ export default function Page() {
 
       <div className="layout">
         <aside className="left-col">
-          <Player currentStation={currentStation} />
+          <Player currentStation={currentStation} onNextStation={nextStation} onPrevStation={prevStation} />
           <div className="glass-panel mini-form">
             <div className="panel-head-small">
               <h3>Panel rápido</h3>

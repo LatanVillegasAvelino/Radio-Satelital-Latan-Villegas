@@ -57,9 +57,33 @@ export default function useStations(){
     load()
   },[])
 
+  const playAtIndex = (index: number) => {
+    if (stations.length === 0) return
+
+    const normalizedIndex = ((index % stations.length) + stations.length) % stations.length
+    const station = stations[normalizedIndex]
+
+    setCurrentStation(station)
+    libPlay(station)
+  }
+
   const playStation = (s:Station)=>{
     setCurrentStation(s)
     libPlay(s)
+  }
+  const nextStation = () => {
+    if (stations.length === 0) return
+    const currentIndex = currentStation
+      ? stations.findIndex(station => station.id === currentStation.id || station.streamUrl === currentStation.streamUrl || station.url === currentStation.url)
+      : -1
+    playAtIndex(currentIndex >= 0 ? currentIndex + 1 : 0)
+  }
+  const prevStation = () => {
+    if (stations.length === 0) return
+    const currentIndex = currentStation
+      ? stations.findIndex(station => station.id === currentStation.id || station.streamUrl === currentStation.streamUrl || station.url === currentStation.url)
+      : -1
+    playAtIndex(currentIndex >= 0 ? currentIndex - 1 : stations.length - 1)
   }
   const toggleFavorite = (s:Station)=>{
     const key = `${s.name}|${s.url || s.streamUrl}`
@@ -92,6 +116,8 @@ export default function useStations(){
     rawStations: stations,
     currentStation,
     playStation,
+    nextStation,
+    prevStation,
     toggleFavorite,
     setQuery,
     filters: exposedFilters,

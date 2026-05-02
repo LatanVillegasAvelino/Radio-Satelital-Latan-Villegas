@@ -5,9 +5,11 @@ import type { Station } from '../types/station'
 
 type Props = {
   currentStation: Station | null
+  onNextStation: () => void
+  onPrevStation: () => void
 }
 
-export default function Player({ currentStation }: Props){
+export default function Player({ currentStation, onNextStation, onPrevStation }: Props){
   const { isPlaying, togglePlay, secondsElapsed } = usePlayer()
 
   useEffect(() => {
@@ -54,9 +56,9 @@ export default function Player({ currentStation }: Props){
       <div className="custom-controls">
         <div className={`timer-text ${isPlaying ? 'live' : ''}`}>{new Date(secondsElapsed * 1000).toISOString().substring(14, 19)}</div>
         <div className="control-group">
-          <button className="sec-btn" onClick={()=>{}} aria-label="Anterior">⏮</button>
+          <button className="sec-btn" onClick={onPrevStation} aria-label="Anterior">⏮</button>
           <button className="play-btn" onClick={togglePlay} aria-pressed={isPlaying} id="playBtn">{isPlaying? '⏸':'▶'}</button>
-          <button className="sec-btn" onClick={()=>{}} aria-label="Siguiente">⏭</button>
+          <button className="sec-btn" onClick={onNextStation} aria-label="Siguiente">⏭</button>
         </div>
       </div>
 
