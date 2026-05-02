@@ -24,7 +24,8 @@ jobs:
         run: cd satelital-radio && npm install
 
       - name: Build
-        run: cd satelital-radio && npm run build
+        working-directory: satelital-radio
+        run: npm run build
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
