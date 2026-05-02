@@ -128,6 +128,8 @@ img{max-width:100%;display:block}
 /* Side menu */
 .side-menu{position:fixed;right:-320px;top:0;height:100%;width:320px;background:linear-gradient(180deg,#071018,rgba(0,0,0,0.2));box-shadow:-8px 0 24px rgba(0,0,0,0.6);transition:right .25s}
 .side-menu.open{right:0}
+.side-menu-content{height:100%;overflow-y:auto;padding-bottom:2rem}
+.side-menu .filters.glass-panel{margin-bottom:1rem}
 
 /* Scrollbar personalizado */
 *::-webkit-scrollbar{width:10px;height:10px}

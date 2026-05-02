@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import Player from '../components/Player'
 import StationGrid from '../components/StationGrid'
 import SideMenu from '../components/SideMenu'
-import Filters from '../components/Filters'
 import BottomNav from '../components/BottomNav'
 import useStations from '../hooks/useStations'
 import { Heart, Menu, Search, Settings } from 'lucide-react'
@@ -15,11 +14,13 @@ export default function Page() {
   const toggleMenu = () => setMenuOpen(open => !open)
   const openMenu = () => setMenuOpen(true)
   const focusSearch = () => {
+    setMenuOpen(true)
     document.getElementById('filters-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     window.setTimeout(() => document.getElementById('station-search')?.focus(), 150)
   }
   const toggleFavorites = () => toggleOnlyFavs(!onlyFavs)
   const focusCountry = () => {
+    setMenuOpen(true)
     document.getElementById('filters-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     window.setTimeout(() => document.getElementById('country-filter')?.focus(), 150)
   }
@@ -61,23 +62,8 @@ export default function Page() {
       <div className="layout">
         <aside className="left-col">
           <Player currentStation={currentStation} onNextStation={nextStation} onPrevStation={prevStation} />
-          <div className="glass-panel mini-form">
-            <div className="panel-head-small">
-              <h3>Panel rápido</h3>
-            </div>
-            {loading ? (
-              <p className="track-meta">Cargando emisoras...</p>
-            ) : error ? (
-              <p className="track-meta" style={{ color: '#ff6b6b' }}>{error}</p>
-            ) : (
-              <p className="track-meta">{stations.length} emisoras disponibles</p>
-            )}
-          </div>
         </aside>
         <main className="right-col">
-          {!error && !loading && (
-            <Filters setQuery={setQuery} filters={filters} toggleOnlyFavs={toggleOnlyFavs} />
-          )}
           {loading && (
             <div style={{ padding: '2rem', textAlign: 'center' }}>
               <p>Conectando con Firebase...</p>
@@ -97,12 +83,22 @@ export default function Page() {
             </div>
           )}
           {!loading && !error && (
-            <StationGrid stations={stations} playStation={playStation} toggleFavorite={toggleFavorite} onResetFilters={showAllStations} />
+            <StationGrid stations={stations} playStation={playStation} toggleFavorite={toggleFavorite} />
           )}
         </main>
       </div>
       <BottomNav onMusic={() => document.getElementById('player-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} onFavorites={toggleFavorites} onCountry={focusCountry} onMyRadios={showAllStations} favoritesActive={onlyFavs} />
-      <SideMenu open={menuOpen} onClose={()=>setMenuOpen(false)} />
+      <SideMenu
+        open={menuOpen}
+        onClose={()=>setMenuOpen(false)}
+        loading={loading}
+        error={error}
+        stationsCount={stations.length}
+        setQuery={setQuery}
+        filters={filters}
+        toggleOnlyFavs={toggleOnlyFavs}
+        onResetFilters={showAllStations}
+      />
     </div>
   )
 }
