@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react'
 import type { Station } from '../types/station'
-import { mergeStationSources, loadGlobalStations as loadGlobal } from '../lib/stations'
+import { defaultStations, mergeStationSources, loadGlobalStations as loadGlobal } from '../lib/stations'
 import { toggleFavorite as toggleFavoriteStorage, getFavorites } from '../lib/favorites'
 import { playStation as libPlay } from '../lib/player'
 
@@ -14,13 +14,13 @@ type Filters = {
 
 export default function useStations(){
   const [stations, setStations] = useState<Station[]>([])
+  const [currentStation, setCurrentStation] = useState<Station | null>(null)
   const [query, setQuery] = useState('')
   const [onlyFavs, setOnlyFavs] = useState(false)
   const [filters, setFilters] = useState<{country?:string,region?:string}>({})
 
   useEffect(()=>{
     async function load(){
-      const defaultStations = (window as any).DEFAULT_STATIONS || []
       const global = await loadGlobal()
       const custom = JSON.parse(localStorage.getItem('ultra_custom')||'[]') || []
       const merged = mergeStationSources(defaultStations, global, custom)
@@ -29,7 +29,10 @@ export default function useStations(){
     load()
   },[])
 
-  const playStation = (s:Station)=> libPlay(s)
+  const playStation = (s:Station)=>{
+    setCurrentStation(s)
+    libPlay(s)
+  }
   const toggleFavorite = (s:Station)=>{
     const key = `${s.name}|${s.url}`
     toggleFavoriteStorage(key)
@@ -56,5 +59,5 @@ export default function useStations(){
     setRegion: (r:string)=> setFilters(f=>({...f,region:r}))
   }
 
-  return { stations: filtered, rawStations: stations, playStation, toggleFavorite, setQuery, filters:exposedFilters, toggleOnlyFavs:(v:boolean)=>setOnlyFavs(v) }
+  return { stations: filtered, rawStations: stations, currentStation, playStation, toggleFavorite, setQuery, filters:exposedFilters, toggleOnlyFavs:(v:boolean)=>setOnlyFavs(v) }
 }

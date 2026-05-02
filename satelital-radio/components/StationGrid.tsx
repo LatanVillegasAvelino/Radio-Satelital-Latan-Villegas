@@ -1,16 +1,18 @@
 "use client"
 import React from 'react'
 import StationCard from './StationCard'
-import Filters from './Filters'
-import useStations from '../hooks/useStations'
+import type { Station } from '../types/station'
 
-export default function StationGrid(){
-  const { stations, playStation, toggleFavorite } = useStations()
+type Props = {
+  stations: Station[]
+  playStation: (station: Station) => void
+  toggleFavorite: (station: Station) => void
+}
 
+export default function StationGrid({ stations, playStation, toggleFavorite }: Props){
   return (
-    <div>
-      <Filters />
-      <div className="stations-grid">
+    <div className="glass-panel">
+      <div className="station-grid">
         {stations.map(s=> (
           <StationCard key={`${s.name}-${s.url}`} station={s} onPlay={playStation} onToggleFav={toggleFavorite} />
         ))}
