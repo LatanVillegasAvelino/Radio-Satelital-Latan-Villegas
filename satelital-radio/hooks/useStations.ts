@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import type { Station } from '../types/station'
 import { mergeStationSources, loadGlobalStations as loadGlobal } from '../lib/stations'
-import { toggleFavorite, getFavorites } from '../lib/favorites'
+import { toggleFavorite as toggleFavoriteStorage, getFavorites } from '../lib/favorites'
 import { playStation as libPlay } from '../lib/player'
 
 type Filters = {
@@ -32,7 +32,7 @@ export default function useStations(){
   const playStation = (s:Station)=> libPlay(s)
   const toggleFavorite = (s:Station)=>{
     const key = `${s.name}|${s.url}`
-    toggleFavorite(key)
+    toggleFavoriteStorage(key)
   }
 
   const filtered = stations.filter(s=>{
